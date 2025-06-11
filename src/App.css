@@ -1,5 +1,26 @@
-#game{
-  border: 3px solid paleturquoise;
-  flex: 0;
-  margin: 0 auto;
+.game{
+  flex: 1;
+  height:75%;
+  width:75%;
+  margin: auto auto;
+  border:2px solid black;
+}
+
+header{
+  display:flex;
+  justify-content:space-around;
+  max-height:5%;
+  flex:1;
+}
+
+.header-links{
+  display:flex;
+  flex-flow:row;
+  gap:32px;
+}
+
+li{
+  font-size:20px;
+  font-weight:bold;
+  list-style-type: none;
 }
