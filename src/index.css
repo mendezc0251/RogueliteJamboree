@@ -4,8 +4,9 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: black;
+  background: #FF432E;
+  background: linear-gradient(0deg, rgba(255, 67, 46, 1) 0%, rgba(253, 239, 20, 1) 50%, rgba(177, 235, 0, 1) 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,10 +25,12 @@ a:hover {
 
 body {
   margin: 0;
+  padding:0;
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  max-height: 100vh;
+  align-items:stretch;
 }
 
 h1 {
@@ -69,5 +72,6 @@ button:focus-visible {
 
 #root{
   display: flex;
+  flex-direction:column;
   flex: 1;
 }

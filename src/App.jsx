@@ -1,15 +1,32 @@
-import { useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import jamboreePng from './assets/jamboree.png'
+import {initCanvas} from './game/initCanvas'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const canvasRef = useRef(null)
+  
+  useEffect(() =>{
+    if (canvasRef.current) {
+      initCanvas(canvasRef.current)
+    }
+  }, []);
 
   return (
     <>
-      <header></header>
-      <canvas id='game' height={"500px"} width={"500px"}></canvas>
+      <header>
+        <img src={jamboreePng} alt="Jamboree"></img>
+        <div className="header-links-container">
+          <ul className="header-links">
+            <li>home</li>
+            <li>shop</li>
+            <li>about</li>
+          </ul>
+        </div>
+      </header>
+      <canvas className="game" ref={canvasRef}></canvas>
     </>
   )
 }
