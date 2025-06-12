@@ -26,7 +26,10 @@ function App() {
           </ul>
         </div>
       </header>
-      <canvas className="game" ref={canvasRef}></canvas>
+      <div className='game-container'>
+        <canvas className="game" ref={canvasRef}></canvas>
+      </div>
+      
     </>
   )
 }
