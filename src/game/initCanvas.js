@@ -6,18 +6,6 @@ export function initCanvas(canvas){
     const container = canvas.parentElement
     const ctx = canvas.getContext('2d')
 
-    
-    
-    function resizeCanvas(){
-        const width = container.clientWidth
-        const height = container.clientHeight
-
-        canvas.width = width
-        canvas.height = height
-
-        render()
-    }
-
     let currentScene = "menu";
 
     function update(){
@@ -64,10 +52,24 @@ export function initCanvas(canvas){
         ctx.fillStyle = "#FFD97D"
         ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight)
 
+        const canvasAspect = canvas.width/canvas.height
+        const headerAspect = headerBack.width/headerBack.height
+
+        let scale
+        if (canvasAspect>headerAspect){
+            scale = canvas.height/headerBack.height
+        } else {
+            scale = canvas.width/headerBack.width
+        }
+        scale = Math.floor(scale)
+
+        const newWidth = headerBack.width*scale
+        const newHeight = headerBack.height*scale
+
         if (headerBack.complete){
             ctx.imageSmoothingEnabled = false
             
-            ctx.drawImage(headerBack, 2000,50)
+            ctx.drawImage(headerBack, (canvas.width-newWidth)/2,(canvas.height-newHeight)*0.4,newWidth,newHeight)
         }
 
         document.fonts.ready.then(()=>{
@@ -78,7 +80,7 @@ export function initCanvas(canvas){
             ctx.fillText("Play!", buttonX+(buttonWidth/2), buttonY+(buttonHeight/2))
             
             ctx.fillStyle = "#F9F7F1"
-            ctx.fillText("Roguelite Jamboree", canvas.width*0.5, canvas.height*0.4)
+            ctx.fillText("Roguelite Jamboree", (canvas.width)*0.5, (canvas.height)*0.4)
 
         })
         
@@ -95,9 +97,6 @@ export function initCanvas(canvas){
         render()
         requestAnimationFrame(gameLoop)
     }
-
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
     gameLoop()
     
 }
