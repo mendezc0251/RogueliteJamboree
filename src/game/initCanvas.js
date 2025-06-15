@@ -17,12 +17,22 @@ export function initCanvas(canvas){
 
     ctx.scale(dpr,dpr)
 
+    let mouseX=0
+    let mouseY=0
+
+    // Track mouse clicks
     canvas.addEventListener("click", function (event){
         const rect = canvas.getBoundingClientRect()
-        const mouseX = event.clientX - rect.left
-        const mouseY = event.clientY - rect.top
+        mouseX = event.clientX - rect.left
+        mouseY = event.clientY - rect.top
 
         handleClick(mouseX, mouseY)
+    })
+    // Track mouse position
+    canvas.addEventListener("mousemove", function(event){
+        const rect = canvas.getBoundingClientRect()
+        mouseX = event.clientX -rect.left
+        mouseY = event.clientY - rect.top
     })
 
     let currentScene = "menu";
@@ -36,7 +46,12 @@ export function initCanvas(canvas){
         }
     }
 
+    // Update funciton for the Menu
     function updateMenu(){
+        buttons.forEach(button=>{
+            button.isHovered = mouseX>=button.x && mouseX<=button.x+button.width
+            && mouseY>=button.y && mouseY<=button.y+button.height
+        })
 
     }
 
@@ -64,8 +79,23 @@ export function initCanvas(canvas){
     const buttonY = displayHeight*0.6 //50% from top
 
     const buttons = [
-        {text: "Play", x:buttonX, y:buttonY, width:buttonWidth, height:buttonHeight, onClick: () => currentScene="characterSelect"}
+        {text: "Play", x:buttonX, y:buttonY, width:buttonWidth, height:buttonHeight, isHovered:false, onClick: () => currentScene="characterSelect"}
     ]
+
+    // function to look for mouse click on buttons
+    function handleClick(mouseX,mouseY){
+        if(currentScene==="menu"){
+            buttons.forEach(button =>{
+                const withinX = mouseX>=button.x && mouseX<=button.x+button.width
+                const withinY = mouseY>=button.y && mouseY<=button.y+button.height
+                if(withinX && withinY){
+                    button.onClick()
+                }
+            })
+        }
+    }
+
+    // render function for the Menu
     function renderMenu(){
         
         
@@ -81,7 +111,7 @@ export function initCanvas(canvas){
         }
 
         buttons.forEach(button =>{
-            ctx.fillStyle = "#FFD97D"
+            ctx.fillStyle = button.isHovered ? "#FFE48D" : "#FFD97D"
             ctx.fillRect(button.x, button.y, button.width, button.height)
             ctx.font = '40px "Press Start 2P"'
             ctx.fillStyle = "#F9F7F1"
@@ -101,7 +131,19 @@ export function initCanvas(canvas){
 
     }
 
+    const charButtons = [
+        {displayWidth:300,displayHeight:300}
+    ]
     function renderChar(){
+        ctx.clearRect(0,0,displayWidth,displayHeight)
+
+        ctx.fillStyle = "#2D2D2D"
+        ctx.fillRect(0,0,displayWidth,displayHeight)
+        
+        ctx.fillStyle = "#FFD97D"
+        ctx.fillRect(displayWidth/8,(displayHeight/2)-150,200,200)
+
+        ctx.fillRect(displayWidth/2.5,(displayHeight/2)-150,200,200)
 
     }
 
