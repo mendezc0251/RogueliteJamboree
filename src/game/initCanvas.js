@@ -39,11 +39,21 @@ export function initCanvas(canvas){
 
     function update(){
         if(currentScene==="menu"){
-            updateMenu();
+            updateMenu()
         }
         else if(currentScene=="characterSelect"){
-            updateChar();
+            updateChar()
         }
+        else if(currentScene==="pachinko"){
+            updatePachinko()
+        }
+        else if(currentScene==="slots"){
+            updateSlots()
+        }
+        else if(currentScene==="chess"){
+            updateChess()
+        }
+        
     }
 
     // Update funciton for the Menu
@@ -56,6 +66,22 @@ export function initCanvas(canvas){
     }
 
     function updateChar(){
+        charButtons.forEach(button=>{
+            button.isHovered = mouseX>=button.x && mouseX<=button.x+button.width
+            && mouseY>=button.y && mouseY<=button.y+button.height
+        })
+
+    }
+
+    function updatePachinko(){
+
+    }
+
+    function updateSlots(){
+
+    }
+
+    function updateChess(){
 
     }
 
@@ -65,6 +91,15 @@ export function initCanvas(canvas){
         }
         else if(currentScene==="characterSelect"){
             renderChar();
+        }
+        else if(currentScene==="pachinko"){
+            renderPachinko()
+        }
+        else if(currentScene==="slots"){
+            renderSlots()
+        }
+        else if(currentScene==="chess"){
+            renderChess()
         }
     }
     //Instantiate header image
@@ -92,6 +127,15 @@ export function initCanvas(canvas){
                     button.onClick()
                 }
             })
+        } 
+        else if(currentScene==="characterSelect"){
+            charButtons.forEach(button=>{
+                const withinX = mouseX>=button.x && mouseX<=button.x+button.width
+                const withinY = mouseY>=button.y && mouseY<=button.y+button.height
+                if(withinX && withinY){
+                    button.onClick()
+                }
+            })
         }
     }
 
@@ -111,7 +155,7 @@ export function initCanvas(canvas){
         }
 
         buttons.forEach(button =>{
-            ctx.fillStyle = button.isHovered ? "#FFE48D" : "#FFD97D"
+            ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
             ctx.fillRect(button.x, button.y, button.width, button.height)
             ctx.font = '40px "Press Start 2P"'
             ctx.fillStyle = "#F9F7F1"
@@ -132,7 +176,9 @@ export function initCanvas(canvas){
     }
 
     const charButtons = [
-        {displayWidth:300,displayHeight:300}
+        {text: "Capy's Coin Waterfall", x:displayWidth*(1/6)-150, y:(displayHeight/2)-150, width:300, height:300, isHovered:false, onClick: () => currentScene="pachinko"},
+        {text: "Croc's Chaotic Slots", x:displayWidth*(3/6)-150, y:(displayHeight/2)-150, width:300, height:300, isHovered:false, onClick: () => currentScene="slots"},
+        {text: "Caty's Chess Set", x:displayWidth*(5/6)-150, y:(displayHeight/2)-150, width:300, height:300, isHovered:false, onClick: () => currentScene="chess"}
     ]
     function renderChar(){
         ctx.clearRect(0,0,displayWidth,displayHeight)
@@ -140,11 +186,24 @@ export function initCanvas(canvas){
         ctx.fillStyle = "#2D2D2D"
         ctx.fillRect(0,0,displayWidth,displayHeight)
         
-        ctx.fillStyle = "#FFD97D"
-        ctx.fillRect(displayWidth/8,(displayHeight/2)-150,200,200)
-
-        ctx.fillRect(displayWidth/2.5,(displayHeight/2)-150,200,200)
-
+        charButtons.forEach(button=>{
+            ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
+            ctx.fillRect(button.x,button.y,button.width,button.height)
+            ctx.font = '18px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(button.text,button.x+150,button.y-50)
+        })
+    }
+    function renderPachinko(){
+        ctx.clearRect(0,0,displayWidth,displayHeight)
+    }
+    function renderSlots(){
+        ctx.clearRect(0,0,displayWidth,displayHeight)
+    }
+    function renderChess(){
+        ctx.clearRect(0,0,displayWidth,displayHeight)
     }
 
     function gameLoop(){
