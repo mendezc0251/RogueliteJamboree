@@ -1,36 +1,32 @@
-import { useRef, useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import jamboreePng from './assets/jamboree.png'
-import {initCanvas} from './game/initCanvas'
+import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
+import Game from './Game'
+import Shop from './Shop'
+import About from './About'
 
 function App() {
-  const canvasRef = useRef(null)
   
-  useEffect(() =>{
-    if (canvasRef.current) {
-      initCanvas(canvasRef.current)
-    }
-  }, []);
 
   return (
-    <>
+    <BrowserRouter>
       <header>
         <img src={jamboreePng} alt="Jamboree"></img>
         <div className="header-links-container">
           <ul className="header-links">
-            <li>home</li>
-            <li>shop</li>
-            <li>about</li>
+            <li><Link to={"/"}>home</Link></li>
+            <li><Link to={"/Shop"}>shop</Link></li>
+            <li><Link to={"/About"}>about</Link></li>
           </ul>
         </div>
       </header>
-      <div className='game-container'>
-        <canvas className="game" ref={canvasRef}></canvas>
-      </div>
+      <Routes>
+        <Route path='/' element={<Game />}/>
+        <Route path='/shop' element={<Shop />}/>
+        <Route path='/about' element={<About/>}/>
+      </Routes>
       
-    </>
+    </BrowserRouter>
   )
 }
 
