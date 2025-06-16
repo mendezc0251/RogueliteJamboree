@@ -79,15 +79,8 @@ export function initCanvas(canvas) {
 
     }
     // instantiate coin object
-    const coin = {
-        x: displayWidth / 2,
-        y: 0,
-        radius: 32,
-        vx: 0,
-        vy: 0,
-        gravity: 0.5,
-        bounceFactor: 0.7
-    }
+    
+    let coins=[]
     // instantiate peg object
     const pegs = [
         { x: 280, y: 80, radius: 40 },
@@ -110,40 +103,58 @@ export function initCanvas(canvas) {
         { x: 840, y: 560, radius: 40 },
     ]
 
+    const dropZone = {
+        xMax:1080,
+        xMin:120
+    }
+    let ghostCoin={
+        x:600,
+        y:0,
+        radius:32
+    }
+    canvas.addEventListener("mousemove",function(event){
+        const rect = canvas.getBoundingClientRect()
+        let mouseX = event.clientX-rect.left
+
+        ghostCoin.x = Math.max(dropZone.xMin+ghostCoin.radius,Math.min(dropZone.xMax+ghostCoin.radius,mouseX))
+    })
+
     function updatePachinko() {
-        coin.vy += coin.gravity
+        coins.forEach(coin=>{
+            coin.vy += coin.gravity
 
-        coin.x += coin.vx
-        coin.y += coin.vy
+            coin.x += coin.vx
+            coin.y += coin.vy
 
-        pegs.forEach(peg => {
-            let dx = coin.x - (peg.x+peg.radius)
-            let dy = coin.y - (peg.y+peg.radius)
-            let dist = Math.sqrt(dx * dx + dy * dy)
-            let minDist = coin.radius + peg.radius
+            pegs.forEach(peg => {
+                let dx = coin.x - (peg.x+peg.radius)
+                let dy = coin.y - (peg.y+peg.radius)
+                let dist = Math.sqrt(dx * dx + dy * dy)
+                let minDist = coin.radius + peg.radius
 
-            if (dist < minDist) {
-                let nx = dx / dist
-                let ny = dy / dist
+                if (dist < minDist) {
+                    let nx = dx / dist
+                    let ny = dy / dist
 
-                let overlap = minDist - dist
-                coin.x += nx * overlap
-                coin.y += ny * overlap
+                    let overlap = minDist - dist
+                    coin.x += nx * overlap
+                    coin.y += ny * overlap
 
-                let dot = coin.vx * nx + coin.vy * ny
-                coin.vx -= 2 * dot * nx
-                coin.vy -= 2 * dot * ny
+                    let dot = coin.vx * nx + coin.vy * ny
+                    coin.vx -= 2 * dot * nx
+                    coin.vy -= 2 * dot * ny
 
-                coin.vx *= coin.bounceFactor
-                coin.vy *= coin.bounceFactor
+                    coin.vx *= coin.bounceFactor
+                    coin.vy *= coin.bounceFactor
 
-                const velocityMag = Math.sqrt(coin.vx**2+coin.vy**2)
-                if(velocityMag<0.5){
-                    coin.vx +=(Math.random()<0.5 ? -1 : 1)*3
+                    const velocityMag = Math.sqrt(coin.vx**2+coin.vy**2)
+                    if(velocityMag<0.5){
+                        coin.vx +=(Math.random()<0.5 ? -1 : 1)*3
+                    }
                 }
-            }
+            })
         })
-
+        coins = coins.filter(coin=>coin.y-coin.radius<displayHeight)
     }
 
     function updateSlots() {
@@ -205,6 +216,17 @@ export function initCanvas(canvas) {
                     button.onClick()
                 }
             })
+        }
+        else if(currentScene==="pachinko"){
+            coins.push({
+            x: ghostCoin.x,
+            y: ghostCoin.y,
+            radius: 32,
+            vx: 0,
+            vy: 0,
+            gravity: 0.5,
+            bounceFactor: 0.7
+        })
         }
     }
 
@@ -298,8 +320,15 @@ export function initCanvas(canvas) {
 
         })
         if(coinImg.complete){
-            ctx.drawImage(coinImg,coin.x-coin.radius,coin.y-coin.radius,coin.radius*2,coin.radius*2)
+            ctx.globalAlpha=0.5
+            ctx.drawImage(coinImg,ghostCoin.x-ghostCoin.radius,ghostCoin.y-ghostCoin.radius,ghostCoin.radius*2,ghostCoin.radius*2)
+            ctx.globalAlpha=1.0
         }
+        coins.forEach(coin=>{
+            if(coinImg.complete){
+                ctx.drawImage(coinImg,coin.x-coin.radius,coin.y-coin.radius,coin.radius*2,coin.radius*2)
+            }
+        })
 
 
     }
