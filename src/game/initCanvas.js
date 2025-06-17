@@ -78,8 +78,13 @@ export function initCanvas(canvas) {
         })
 
     }
-    // instantiate coin object
     
+    const leftWallX = 159
+    const rightWallX=1120
+
+    let cameraY = 0
+    const maxWorldHeight = 1200
+    // instantiate coins array
     let coins=[]
     // instantiate peg object
     const pegs = [
@@ -101,6 +106,11 @@ export function initCanvas(canvas) {
         { x: 520, y: 560, radius: 40 },
         { x: 680, y: 560, radius: 40 },
         { x: 840, y: 560, radius: 40 },
+        { x: 280, y: 720, radius: 40 },
+        { x: 440, y: 720, radius: 40 },
+        { x: 600, y: 720, radius: 40 },
+        { x: 760, y: 720, radius: 40 },
+        { x: 920, y: 720, radius: 40 },
     ]
 
     const dropZone = {
@@ -125,7 +135,15 @@ export function initCanvas(canvas) {
 
             coin.x += coin.vx
             coin.y += coin.vy
-
+            // handle coin collision with walls
+            if (coin.x-coin.radius<leftWallX){
+                coin.x = leftWallX + coin.radius
+                coin.vx*=-coin.bounceFactor
+            } else if (coin.x+coin.radius>rightWallX) {
+                coin.x = rightWallX-coin.radius
+                coin.vx*=-coin.bounceFactor
+            }
+            // handle coin collison with pegs
             pegs.forEach(peg => {
                 let dx = coin.x - (peg.x+peg.radius)
                 let dy = coin.y - (peg.y+peg.radius)
@@ -154,7 +172,16 @@ export function initCanvas(canvas) {
                 }
             })
         })
-        coins = coins.filter(coin=>coin.y-coin.radius<displayHeight)
+        if(coins.length>0){
+            const lastCoin = coins[coins.length-1]
+            const targetY = lastCoin.y - displayHeight/2
+
+            cameraY += (targetY-cameraY)*0.05
+            cameraY = Math.max(0,Math.min(cameraY,maxWorldHeight-displayHeight))
+        } else {
+            cameraY += (0-cameraY)*0.05
+        }
+        coins = coins.filter(coin=>coin.y-coin.radius<cameraY+displayHeight)
     }
 
     function updateSlots() {
@@ -271,6 +298,8 @@ export function initCanvas(canvas) {
         { text: "Croc's Chaotic Slots", x: displayWidth * (3 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "slots" },
         { text: "Caty's Chess Set", x: displayWidth * (5 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "chess" }
     ]
+
+    // render character select screen
     function renderChar() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
 
@@ -287,6 +316,8 @@ export function initCanvas(canvas) {
             ctx.fillText(button.text, button.x + 150, button.y - 50)
         })
     }
+    
+    
     const coinImg = new Image()
     coinImg.src = coinImgSrc
 
@@ -304,6 +335,7 @@ export function initCanvas(canvas) {
 
     const pBack4 = new Image()
     pBack4.src = pBackImg4
+    
     // render Pachinko game
     function renderPachinko() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
@@ -313,20 +345,24 @@ export function initCanvas(canvas) {
         ctx.drawImage(pBack3,0,0,displayWidth,displayHeight)
         ctx.drawImage(pBack4,0,0,displayWidth,displayHeight)
 
+        ctx.fillStyle="#A8E6CF"
+        ctx.fillRect(159-4,0-cameraY,8,displayHeight)
+        ctx.fillRect(1120-4,0-cameraY,8,displayHeight)
+
         pegs.forEach(peg => {
             if (pegImg.complete) {
-                ctx.drawImage(pegImg, peg.x, peg.y, peg.radius * 2, peg.radius * 2)
+                ctx.drawImage(pegImg, peg.x, peg.y-cameraY, peg.radius * 2, peg.radius * 2)
             }
 
         })
         if(coinImg.complete){
             ctx.globalAlpha=0.5
-            ctx.drawImage(coinImg,ghostCoin.x-ghostCoin.radius,ghostCoin.y-ghostCoin.radius,ghostCoin.radius*2,ghostCoin.radius*2)
+            ctx.drawImage(coinImg,ghostCoin.x-ghostCoin.radius,(ghostCoin.y-ghostCoin.radius)-cameraY,ghostCoin.radius*2,ghostCoin.radius*2)
             ctx.globalAlpha=1.0
         }
         coins.forEach(coin=>{
             if(coinImg.complete){
-                ctx.drawImage(coinImg,coin.x-coin.radius,coin.y-coin.radius,coin.radius*2,coin.radius*2)
+                ctx.drawImage(coinImg,coin.x-coin.radius,(coin.y-coin.radius)-cameraY,coin.radius*2,coin.radius*2)
             }
         })
 
