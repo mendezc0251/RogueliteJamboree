@@ -79,39 +79,39 @@ export function initCanvas(canvas) {
 
     }
     
-    const leftWallX = 159
-    const rightWallX=1120
+    const leftWallX = 119
+    const rightWallX=1160
 
     let cameraY = 0
     const maxWorldHeight = 1200
     // instantiate coins array
     let coins=[]
     // instantiate peg object
-    const pegs = [
-        { x: 280, y: 80, radius: 40 },
-        { x: 440, y: 80, radius: 40 },
-        { x: 600, y: 80, radius: 40 },
-        { x: 760, y: 80, radius: 40 },
-        { x: 920, y: 80, radius: 40 },
-        { x: 360, y: 240, radius: 40 },
-        { x: 520, y: 240, radius: 40 },
-        { x: 680, y: 240, radius: 40 },
-        { x: 840, y: 240, radius: 40 },
-        { x: 280, y: 400, radius: 40 },
-        { x: 440, y: 400, radius: 40 },
-        { x: 600, y: 400, radius: 40 },
-        { x: 760, y: 400, radius: 40 },
-        { x: 920, y: 400, radius: 40 },
-        { x: 360, y: 560, radius: 40 },
-        { x: 520, y: 560, radius: 40 },
-        { x: 680, y: 560, radius: 40 },
-        { x: 840, y: 560, radius: 40 },
-        { x: 280, y: 720, radius: 40 },
-        { x: 440, y: 720, radius: 40 },
-        { x: 600, y: 720, radius: 40 },
-        { x: 760, y: 720, radius: 40 },
-        { x: 920, y: 720, radius: 40 },
-    ]
+    
+    function generatePegs(setCount){
+        const pegs=[]
+        const rowSpacing=160
+        const firstRowY=80
+        const secondRowY=firstRowY+160
+        const rowOffsets=[
+            [80,280,440,600,760,920,1120],
+            [200,360,520,680,840,1000]
+        ]
+        const pegRadius=40
+        for(let i=0;i<setCount;i++){
+            const yOffset = i*rowSpacing*2
+
+            for(let x of rowOffsets[0]){
+                pegs.push({x,y:firstRowY+yOffset,radius:pegRadius})
+            }
+
+            for(let x of rowOffsets[1]){
+                pegs.push({x,y:secondRowY+yOffset,radius:pegRadius})
+            }
+        }
+        return pegs
+    }
+    const pegs = generatePegs(6)
 
     const dropZone = {
         xMax:1080,
@@ -346,8 +346,8 @@ export function initCanvas(canvas) {
         ctx.drawImage(pBack4,0,0,displayWidth,displayHeight)
 
         ctx.fillStyle="#A8E6CF"
-        ctx.fillRect(159-4,0-cameraY,8,displayHeight)
-        ctx.fillRect(1120-4,0-cameraY,8,displayHeight)
+        ctx.fillRect(leftWallX-4,0-cameraY,8,displayHeight)
+        ctx.fillRect(rightWallX-4,0-cameraY,8,displayHeight)
 
         pegs.forEach(peg => {
             if (pegImg.complete) {
@@ -365,8 +365,6 @@ export function initCanvas(canvas) {
                 ctx.drawImage(coinImg,coin.x-coin.radius,(coin.y-coin.radius)-cameraY,coin.radius*2,coin.radius*2)
             }
         })
-
-
     }
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
