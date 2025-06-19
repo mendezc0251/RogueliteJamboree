@@ -1,5 +1,6 @@
 import headerBacking from '../assets/HeaderA.png'
 import pegImgSrc from '../assets/Peg.png'
+import hitPegImgSrc from '../assets/PegHit.png'
 import coinImgSrc from '../assets/Coin.png'
 import pBackImg1 from '../assets/cloud1.png'
 import pBackImg2 from '../assets/cloud2.png'
@@ -84,10 +85,11 @@ export function initCanvas(canvas) {
 
     let cameraY = 0
     const maxWorldHeight = 1200
-    // instantiate coins array
+    // instantiate coins array and ammo
     let coins=[]
+    let ammo = 2
     // instantiate peg object
-    
+    let pegAmount=1
     function generatePegs(setCount){
         const pegs=[]
         const rowSpacing=160
@@ -102,16 +104,19 @@ export function initCanvas(canvas) {
             const yOffset = i*rowSpacing*2
 
             for(let x of rowOffsets[0]){
-                pegs.push({x,y:firstRowY+yOffset,radius:pegRadius})
+                pegs.push({x,y:firstRowY+yOffset,radius:pegRadius,amount:pegAmount,hit:false})
             }
 
             for(let x of rowOffsets[1]){
-                pegs.push({x,y:secondRowY+yOffset,radius:pegRadius})
+                pegs.push({x,y:secondRowY+yOffset,radius:pegRadius,amount:pegAmount,hit:false})
             }
         }
         return pegs
     }
     const pegs = generatePegs(6)
+
+    let round = 1
+    let rounds = 5
 
     const dropZone = {
         xMax:1080,
@@ -130,6 +135,12 @@ export function initCanvas(canvas) {
     })
 
     function updatePachinko() {
+        //TODO: Fix bug if statement called multiple times
+        if(ammo==0 && coins==0 && round<=rounds){
+            console.log("ROUND OVER!")
+            round+=1
+            console.log(round)
+        }
         coins.forEach(coin=>{
             coin.vy += coin.gravity
 
@@ -169,6 +180,7 @@ export function initCanvas(canvas) {
                     if(velocityMag<0.5){
                         coin.vx +=(Math.random()<0.5 ? -1 : 1)*3
                     }
+                    peg.hit=true
                 }
             })
         })
@@ -245,15 +257,19 @@ export function initCanvas(canvas) {
             })
         }
         else if(currentScene==="pachinko"){
-            coins.push({
-            x: ghostCoin.x,
-            y: ghostCoin.y,
-            radius: 32,
-            vx: 0,
-            vy: 0,
-            gravity: 0.5,
-            bounceFactor: 0.7
-        })
+            if(coins.length<=0 && ammo!=0){
+                coins.push({
+                x: ghostCoin.x,
+                y: ghostCoin.y,
+                radius: 32,
+                vx: 0,
+                vy: 0,
+                gravity: 0.5,
+                bounceFactor: 0.7
+                })
+                
+                ammo-=1
+            }
         }
     }
 
@@ -324,6 +340,9 @@ export function initCanvas(canvas) {
     const pegImg = new Image()
     pegImg.src = pegImgSrc
 
+    const hitPegImg = new Image()
+    hitPegImg.src = hitPegImgSrc
+
     const pBack1 = new Image()
     pBack1.src = pBackImg1
 
@@ -350,8 +369,10 @@ export function initCanvas(canvas) {
         ctx.fillRect(rightWallX-4,0-cameraY,8,displayHeight)
 
         pegs.forEach(peg => {
-            if (pegImg.complete) {
+            if (pegImg.complete && peg.hit==false) {
                 ctx.drawImage(pegImg, peg.x, peg.y-cameraY, peg.radius * 2, peg.radius * 2)
+            } else if(hitPegImg.complete && peg.hit==true){
+                ctx.drawImage(hitPegImg, peg.x,peg.y-cameraY,peg.radius*2,peg.radius*2)
             }
 
         })
