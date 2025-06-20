@@ -113,10 +113,11 @@ export function initCanvas(canvas) {
         }
         return pegs
     }
-    const pegs = generatePegs(6)
+    const pegs = generatePegs(3)
 
     let round = 1
     let rounds = 5
+    let score=0
 
     const dropZone = {
         xMax:1080,
@@ -127,6 +128,17 @@ export function initCanvas(canvas) {
         y:0,
         radius:32
     }
+    function resetBoard(coin){
+        if(coin.y-coin.radius<cameraY+displayHeight){
+            return true
+        }
+        else{
+            pegs.forEach(peg=>{
+                if(peg.hit==true)
+                    {peg.hit=false}})
+            return false
+        }
+            }
     canvas.addEventListener("mousemove",function(event){
         const rect = canvas.getBoundingClientRect()
         let mouseX = event.clientX-rect.left
@@ -135,11 +147,17 @@ export function initCanvas(canvas) {
     })
 
     function updatePachinko() {
-        //TODO: Fix bug if statement called multiple times
-        if(ammo==0 && coins==0 && round<=rounds){
+        if(ammo==0 && coins==0){
+            if(round==rounds){
+                console.log("Game Over")
+            }
+            else{
+            console.log(score)
             console.log("ROUND OVER!")
             round+=1
             console.log(round)
+            ammo+=2
+            }
         }
         coins.forEach(coin=>{
             coin.vy += coin.gravity
@@ -180,7 +198,10 @@ export function initCanvas(canvas) {
                     if(velocityMag<0.5){
                         coin.vx +=(Math.random()<0.5 ? -1 : 1)*3
                     }
-                    peg.hit=true
+                    if(peg.hit==false){
+                        peg.hit=true
+                        score+=1
+                    }
                 }
             })
         })
@@ -193,7 +214,7 @@ export function initCanvas(canvas) {
         } else {
             cameraY += (0-cameraY)*0.05
         }
-        coins = coins.filter(coin=>coin.y-coin.radius<cameraY+displayHeight)
+        coins = coins.filter(resetBoard)
     }
 
     function updateSlots() {
@@ -258,6 +279,7 @@ export function initCanvas(canvas) {
         }
         else if(currentScene==="pachinko"){
             if(coins.length<=0 && ammo!=0){
+
                 coins.push({
                 x: ghostCoin.x,
                 y: ghostCoin.y,
@@ -359,6 +381,9 @@ export function initCanvas(canvas) {
     function renderPachinko() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
 
+
+        
+
         ctx.drawImage(pBack1,0,0,displayWidth,displayHeight)
         ctx.drawImage(pBack2,0,0,displayWidth,displayHeight)
         ctx.drawImage(pBack3,0,0,displayWidth,displayHeight)
@@ -386,6 +411,13 @@ export function initCanvas(canvas) {
                 ctx.drawImage(coinImg,coin.x-coin.radius,(coin.y-coin.radius)-cameraY,coin.radius*2,coin.radius*2)
             }
         })
+        ctx.globalAlpha=0.6
+        ctx.font = '40px "Press Start 2P"'
+        ctx.textAlign = "center"
+        ctx.textBaseline = "left"
+        ctx.fillStyle = "#F9F7F1"
+        ctx.fillText(score,100,25)
+        ctx.globalAlpha=1.0
     }
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
