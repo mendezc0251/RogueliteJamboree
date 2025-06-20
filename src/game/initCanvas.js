@@ -115,8 +115,24 @@ export function initCanvas(canvas) {
     }
     const pegs = generatePegs(3)
 
+    const bottomWalls=[
+        {x:199,y:maxWorldHeight-48,width:2,height:48},
+        {x:279,y:maxWorldHeight-48,width:2,height:48},
+        {x:359,y:maxWorldHeight-48,width:2,height:48},
+        {x:439,y:maxWorldHeight-48,width:2,height:48},
+        {x:519,y:maxWorldHeight-48,width:2,height:48},
+        {x:599,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:679,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:759,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:839,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:919,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:999,y:maxWorldHeight-cameraY-48,width:2,height:48},
+        {x:1079,y:maxWorldHeight-cameraY-48,width:2,height:48},
+    ]
+
     let round = 1
     let rounds = 5
+    let totalScore=0
     let score=0
 
     const dropZone = {
@@ -172,6 +188,28 @@ export function initCanvas(canvas) {
                 coin.x = rightWallX-coin.radius
                 coin.vx*=-coin.bounceFactor
             }
+            
+            // handle bottom wall collisions
+            bottomWalls.forEach(wall=>{
+                const wallY = maxWorldHeight-wall.height
+
+                if(
+                    coin.x+coin.radius>wall.x &&
+                    coin.x-coin.radius<wall.x+wall.width &&
+                    coin.y+coin.radius>wallY &&
+                    coin.y-coin.radius<wallY+wall.height
+                ){
+                    if(coin.x<wall.x+wall.width/2){
+                        coin.x=wall.x-coin.radius
+                    } else {
+                        coin.x = wall.x+wall.width+coin.radius
+                    }
+                    coin.vx*=-coin.bounceFactor
+
+                    coin.vy*=0.25
+                }
+            })
+            
             // handle coin collison with pegs
             pegs.forEach(peg => {
                 let dx = coin.x - (peg.x+peg.radius)
@@ -390,8 +428,16 @@ export function initCanvas(canvas) {
         ctx.drawImage(pBack4,0,0,displayWidth,displayHeight)
 
         ctx.fillStyle="#A8E6CF"
-        ctx.fillRect(leftWallX-4,0-cameraY,8,displayHeight)
-        ctx.fillRect(rightWallX-4,0-cameraY,8,displayHeight)
+        ctx.fillRect(leftWallX-4,0-cameraY,8,maxWorldHeight)
+        ctx.fillRect(rightWallX-4,0-cameraY,8,maxWorldHeight)
+
+        bottomWalls.forEach(wall =>{
+            ctx.fillStyle="#2D2D2D"
+            ctx.fillRect(wall.x,wall.y-cameraY,wall.width,wall.height)
+        })
+
+        ctx.fillStyle="#2D2D2D"
+        ctx.fillRect(199,maxWorldHeight-cameraY-48,2,48)
 
         pegs.forEach(peg => {
             if (pegImg.complete && peg.hit==false) {
