@@ -129,6 +129,25 @@ export function initCanvas(canvas) {
         {x:999,y:maxWorldHeight-cameraY-48,width:2,height:48},
         {x:1079,y:maxWorldHeight-cameraY-48,width:2,height:48},
     ]
+    let multiplier=["x2","x1","x.5"]
+    let multipliers=[
+        {text:null,textX:159,textY:displayHeight-24,x:119,y:cameraY+displayHeight},
+        {text:null,textX:239,textY:displayHeight-24,x:199,y:cameraY+displayHeight},
+        {text:null,textX:319,textY:displayHeight-24,x:279,y:cameraY+displayHeight},
+        {text:null,textX:399,textY:displayHeight-24,x:359,y:cameraY+displayHeight},
+        {text:null,textX:479,textY:displayHeight-24,x:439,y:cameraY+displayHeight},
+        {text:null,textX:559,textY:displayHeight-24,x:519,y:cameraY+displayHeight},
+        {text:null,textX:639,textY:displayHeight-24,x:599,y:cameraY+displayHeight},
+        {text:null,textX:719,textY:displayHeight-24,x:679,y:cameraY+displayHeight},
+        {text:null,textX:799,textY:displayHeight-24,x:759,y:cameraY+displayHeight},
+        {text:null,textX:879,textY:displayHeight-24,x:839,y:cameraY+displayHeight},
+        {text:null,textX:959,textY:displayHeight-24,x:919,y:cameraY+displayHeight},
+        {text:null,textX:1039,textY:displayHeight-24,x:999,y:cameraY+displayHeight},
+        {text:null,textX:1119,textY:displayHeight-24,x:1079,y:cameraY+displayHeight},
+    ]
+    multipliers.forEach(multi=>{
+        multi.text=multiplier[Math.floor(Math.random()*multiplier.length)]
+    })
 
     let round = 1
     let rounds = 5
@@ -332,7 +351,6 @@ export function initCanvas(canvas) {
             }
         }
     }
-
     // render function for the Menu
     function renderMenu() {
 
@@ -434,6 +452,14 @@ export function initCanvas(canvas) {
         bottomWalls.forEach(wall =>{
             ctx.fillStyle="#2D2D2D"
             ctx.fillRect(wall.x,wall.y-cameraY,wall.width,wall.height)
+        })
+
+        multipliers.forEach(multi=>{
+            ctx.globalAlpha=0.5
+            ctx.font = '20px "Press Start 2P"'
+            ctx.fillStyle="#2D2D2D"
+            ctx.fillText(multi.text,multi.textX,multi.textY)
+            ctx.globalAlpha=1.0
         })
 
         ctx.fillStyle="#2D2D2D"
