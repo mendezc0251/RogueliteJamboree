@@ -79,160 +79,182 @@ export function initCanvas(canvas) {
         })
 
     }
-    
+
     const leftWallX = 119
-    const rightWallX=1160
+    const rightWallX = 1160
 
     let cameraY = 0
     const maxWorldHeight = 1200
     // instantiate coins array and ammo
-    let coins=[]
+    let coins = []
     let ammo = 2
     // instantiate peg object
-    let pegAmount=1
-    function generatePegs(setCount){
-        const pegs=[]
-        const rowSpacing=160
-        const firstRowY=80
-        const secondRowY=firstRowY+160
-        const rowOffsets=[
-            [80,280,440,600,760,920,1120],
-            [200,360,520,680,840,1000]
+    let pegAmount = 1
+    function generatePegs(setCount) {
+        const pegs = []
+        const rowSpacing = 160
+        const firstRowY = 80
+        const secondRowY = firstRowY + 160
+        const rowOffsets = [
+            [80, 280, 440, 600, 760, 920, 1120],
+            [200, 360, 520, 680, 840, 1000]
         ]
-        const pegRadius=40
-        for(let i=0;i<setCount;i++){
-            const yOffset = i*rowSpacing*2
+        const pegRadius = 40
+        for (let i = 0; i < setCount; i++) {
+            const yOffset = i * rowSpacing * 2
 
-            for(let x of rowOffsets[0]){
-                pegs.push({x,y:firstRowY+yOffset,radius:pegRadius,amount:pegAmount,hit:false})
+            for (let x of rowOffsets[0]) {
+                pegs.push({ x, y: firstRowY + yOffset, radius: pegRadius, amount: pegAmount, hit: false })
             }
 
-            for(let x of rowOffsets[1]){
-                pegs.push({x,y:secondRowY+yOffset,radius:pegRadius,amount:pegAmount,hit:false})
+            for (let x of rowOffsets[1]) {
+                pegs.push({ x, y: secondRowY + yOffset, radius: pegRadius, amount: pegAmount, hit: false })
             }
         }
         return pegs
     }
     const pegs = generatePegs(3)
 
-    const bottomWalls=[
-        {x:199,y:maxWorldHeight-48,width:2,height:48},
-        {x:279,y:maxWorldHeight-48,width:2,height:48},
-        {x:359,y:maxWorldHeight-48,width:2,height:48},
-        {x:439,y:maxWorldHeight-48,width:2,height:48},
-        {x:519,y:maxWorldHeight-48,width:2,height:48},
-        {x:599,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:679,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:759,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:839,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:919,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:999,y:maxWorldHeight-cameraY-48,width:2,height:48},
-        {x:1079,y:maxWorldHeight-cameraY-48,width:2,height:48},
+    const bottomWalls = [
+        { x: 199, y: maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 279, y: maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 359, y: maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 439, y: maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 519, y: maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 599, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 679, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 759, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 839, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 919, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 999, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 1079, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
     ]
-    let multiplier=["x2","x1","x.5"]
-    let multipliers=[
-        {text:null,textX:159,textY:displayHeight-24,x:119,y:cameraY+displayHeight},
-        {text:null,textX:239,textY:displayHeight-24,x:199,y:cameraY+displayHeight},
-        {text:null,textX:319,textY:displayHeight-24,x:279,y:cameraY+displayHeight},
-        {text:null,textX:399,textY:displayHeight-24,x:359,y:cameraY+displayHeight},
-        {text:null,textX:479,textY:displayHeight-24,x:439,y:cameraY+displayHeight},
-        {text:null,textX:559,textY:displayHeight-24,x:519,y:cameraY+displayHeight},
-        {text:null,textX:639,textY:displayHeight-24,x:599,y:cameraY+displayHeight},
-        {text:null,textX:719,textY:displayHeight-24,x:679,y:cameraY+displayHeight},
-        {text:null,textX:799,textY:displayHeight-24,x:759,y:cameraY+displayHeight},
-        {text:null,textX:879,textY:displayHeight-24,x:839,y:cameraY+displayHeight},
-        {text:null,textX:959,textY:displayHeight-24,x:919,y:cameraY+displayHeight},
-        {text:null,textX:1039,textY:displayHeight-24,x:999,y:cameraY+displayHeight},
-        {text:null,textX:1119,textY:displayHeight-24,x:1079,y:cameraY+displayHeight},
+    let multiplier = ["x2", "x1", "x.5"]
+    let multipliers = [
+        { text: null, textX: 159, textY: displayHeight - 24, x: 119, y: cameraY + displayHeight },
+        { text: null, textX: 239, textY: displayHeight - 24, x: 199, y: cameraY + displayHeight },
+        { text: null, textX: 319, textY: displayHeight - 24, x: 279, y: cameraY + displayHeight },
+        { text: null, textX: 399, textY: displayHeight - 24, x: 359, y: cameraY + displayHeight },
+        { text: null, textX: 479, textY: displayHeight - 24, x: 439, y: cameraY + displayHeight },
+        { text: null, textX: 559, textY: displayHeight - 24, x: 519, y: cameraY + displayHeight },
+        { text: null, textX: 639, textY: displayHeight - 24, x: 599, y: cameraY + displayHeight },
+        { text: null, textX: 719, textY: displayHeight - 24, x: 679, y: cameraY + displayHeight },
+        { text: null, textX: 799, textY: displayHeight - 24, x: 759, y: cameraY + displayHeight },
+        { text: null, textX: 879, textY: displayHeight - 24, x: 839, y: cameraY + displayHeight },
+        { text: null, textX: 959, textY: displayHeight - 24, x: 919, y: cameraY + displayHeight },
+        { text: null, textX: 1039, textY: displayHeight - 24, x: 999, y: cameraY + displayHeight },
+        { text: null, textX: 1119, textY: displayHeight - 24, x: 1079, y: cameraY + displayHeight },
     ]
-    multipliers.forEach(multi=>{
-        multi.text=multiplier[Math.floor(Math.random()*multiplier.length)]
-    })
+
+    multipliers.forEach(multi => {
+                multi.text = multiplier[Math.floor(Math.random() * multiplier.length)]
+            })
 
     let round = 1
     let rounds = 5
-    let totalScore=0
-    let score=0
+    let totalScore = 0
+    let score = 0
 
     const dropZone = {
-        xMax:1080,
-        xMin:120
+        xMax: 1080,
+        xMin: 120
     }
-    let ghostCoin={
-        x:600,
-        y:0,
-        radius:32
+    let ghostCoin = {
+        x: 600,
+        y: 0,
+        radius: 32
     }
-    function resetBoard(coin){
-        if(coin.y-coin.radius<cameraY+displayHeight){
+    function resetBoard(coin) {
+        if (coin.y - coin.radius < cameraY + displayHeight) {
             return true
         }
-        else{
-            pegs.forEach(peg=>{
-                if(peg.hit==true)
-                    {peg.hit=false}})
+        else {
+            console.log(score+" Before multiplier")
+            multiScore(coin.x)
+            console.log(score+" After multiplier")
+            pegs.forEach(peg => {
+                if (peg.hit == true) {
+                    peg.hit = false
+                }
+            })
+            
+            multipliers.forEach(multi => {
+                multi["text"] = multiplier[Math.floor(Math.random() * multiplier.length)]
+            })
+            totalScore+=score
+            score=0
             return false
         }
-            }
-    canvas.addEventListener("mousemove",function(event){
-        const rect = canvas.getBoundingClientRect()
-        let mouseX = event.clientX-rect.left
+    }
+//Todo: fix bug in multiScore being called for 2 frames and detection of coins x being innacurate
+function multiScore(c){
+    console.log(c)
+    multipliers.forEach(multi=>{
+        if(c>multi.x && c<multi.x+80){
+            console.log(parseFloat((""+multi.text).slice(1)))
+            score=score*Math.floor(parseFloat((""+multi.text).slice(1)))
+        }
+    })
+}
 
-        ghostCoin.x = Math.max(dropZone.xMin+ghostCoin.radius,Math.min(dropZone.xMax+ghostCoin.radius,mouseX))
+    canvas.addEventListener("mousemove", function (event) {
+        const rect = canvas.getBoundingClientRect()
+        let mouseX = event.clientX - rect.left
+
+        ghostCoin.x = Math.max(dropZone.xMin + ghostCoin.radius, Math.min(dropZone.xMax + ghostCoin.radius, mouseX))
     })
 
     function updatePachinko() {
-        if(ammo==0 && coins==0){
-            if(round==rounds){
+        if (ammo == 0 && coins == 0) {
+            if (round == rounds) {
                 console.log("Game Over")
             }
-            else{
-            console.log(score)
-            console.log("ROUND OVER!")
-            round+=1
-            console.log(round)
-            ammo+=2
+            else {
+                console.log("ROUND OVER!")
+                round += 1
+                console.log(round)
+                ammo += 2
             }
         }
-        coins.forEach(coin=>{
+        coins.forEach(coin => {
             coin.vy += coin.gravity
 
             coin.x += coin.vx
             coin.y += coin.vy
             // handle coin collision with walls
-            if (coin.x-coin.radius<leftWallX){
+            if (coin.x - coin.radius < leftWallX) {
                 coin.x = leftWallX + coin.radius
-                coin.vx*=-coin.bounceFactor
-            } else if (coin.x+coin.radius>rightWallX) {
-                coin.x = rightWallX-coin.radius
-                coin.vx*=-coin.bounceFactor
+                coin.vx *= -coin.bounceFactor
+            } else if (coin.x + coin.radius > rightWallX) {
+                coin.x = rightWallX - coin.radius
+                coin.vx *= -coin.bounceFactor
             }
-            
+
             // handle bottom wall collisions
-            bottomWalls.forEach(wall=>{
-                const wallY = maxWorldHeight-wall.height
+            bottomWalls.forEach(wall => {
+                const wallY = maxWorldHeight - wall.height
 
-                if(
-                    coin.x+coin.radius>wall.x &&
-                    coin.x-coin.radius<wall.x+wall.width &&
-                    coin.y+coin.radius>wallY &&
-                    coin.y-coin.radius<wallY+wall.height
-                ){
-                    if(coin.x<wall.x+wall.width/2){
-                        coin.x=wall.x-coin.radius
+                if (
+                    coin.x + coin.radius > wall.x &&
+                    coin.x - coin.radius < wall.x + wall.width &&
+                    coin.y + coin.radius > wallY &&
+                    coin.y - coin.radius < wallY + wall.height
+                ) {
+                    if (coin.x < wall.x + wall.width / 2) {
+                        coin.x = wall.x - coin.radius
                     } else {
-                        coin.x = wall.x+wall.width+coin.radius
+                        coin.x = wall.x + wall.width + coin.radius
                     }
-                    coin.vx*=-coin.bounceFactor
+                    coin.vx *= -coin.bounceFactor
 
-                    coin.vy*=0.25
+                    coin.vy *= 0.25
                 }
             })
-            
+
             // handle coin collison with pegs
             pegs.forEach(peg => {
-                let dx = coin.x - (peg.x+peg.radius)
-                let dy = coin.y - (peg.y+peg.radius)
+                let dx = coin.x - (peg.x + peg.radius)
+                let dy = coin.y - (peg.y + peg.radius)
                 let dist = Math.sqrt(dx * dx + dy * dy)
                 let minDist = coin.radius + peg.radius
 
@@ -251,25 +273,25 @@ export function initCanvas(canvas) {
                     coin.vx *= coin.bounceFactor
                     coin.vy *= coin.bounceFactor
 
-                    const velocityMag = Math.sqrt(coin.vx**2+coin.vy**2)
-                    if(velocityMag<0.5){
-                        coin.vx +=(Math.random()<0.5 ? -1 : 1)*3
+                    const velocityMag = Math.sqrt(coin.vx ** 2 + coin.vy ** 2)
+                    if (velocityMag < 0.5) {
+                        coin.vx += (Math.random() < 0.5 ? -1 : 1) * 3
                     }
-                    if(peg.hit==false){
-                        peg.hit=true
-                        score+=1
+                    if (peg.hit == false) {
+                        peg.hit = true
+                        score += 1
                     }
                 }
             })
         })
-        if(coins.length>0){
-            const lastCoin = coins[coins.length-1]
-            const targetY = lastCoin.y - displayHeight/2
+        if (coins.length > 0) {
+            const lastCoin = coins[coins.length - 1]
+            const targetY = lastCoin.y - displayHeight / 2
 
-            cameraY += (targetY-cameraY)*0.05
-            cameraY = Math.max(0,Math.min(cameraY,maxWorldHeight-displayHeight))
+            cameraY += (targetY - cameraY) * 0.05
+            cameraY = Math.max(0, Math.min(cameraY, maxWorldHeight - displayHeight))
         } else {
-            cameraY += (0-cameraY)*0.05
+            cameraY += (0 - cameraY) * 0.05
         }
         coins = coins.filter(resetBoard)
     }
@@ -334,20 +356,20 @@ export function initCanvas(canvas) {
                 }
             })
         }
-        else if(currentScene==="pachinko"){
-            if(coins.length<=0 && ammo!=0){
+        else if (currentScene === "pachinko") {
+            if (coins.length <= 0 && ammo != 0) {
 
                 coins.push({
-                x: ghostCoin.x,
-                y: ghostCoin.y,
-                radius: 32,
-                vx: 0,
-                vy: 0,
-                gravity: 0.5,
-                bounceFactor: 0.7
+                    x: ghostCoin.x,
+                    y: ghostCoin.y,
+                    radius: 32,
+                    vx: 0,
+                    vy: 0,
+                    gravity: 0.5,
+                    bounceFactor: 0.7
                 })
-                
-                ammo-=1
+
+                ammo -= 1
             }
         }
     }
@@ -410,8 +432,8 @@ export function initCanvas(canvas) {
             ctx.fillText(button.text, button.x + 150, button.y - 50)
         })
     }
-    
-    
+
+
     const coinImg = new Image()
     coinImg.src = coinImgSrc
 
@@ -432,64 +454,64 @@ export function initCanvas(canvas) {
 
     const pBack4 = new Image()
     pBack4.src = pBackImg4
-    
+
     // render Pachinko game
     function renderPachinko() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
 
 
-        
 
-        ctx.drawImage(pBack1,0,0,displayWidth,displayHeight)
-        ctx.drawImage(pBack2,0,0,displayWidth,displayHeight)
-        ctx.drawImage(pBack3,0,0,displayWidth,displayHeight)
-        ctx.drawImage(pBack4,0,0,displayWidth,displayHeight)
 
-        ctx.fillStyle="#A8E6CF"
-        ctx.fillRect(leftWallX-4,0-cameraY,8,maxWorldHeight)
-        ctx.fillRect(rightWallX-4,0-cameraY,8,maxWorldHeight)
+        ctx.drawImage(pBack1, 0, 0, displayWidth, displayHeight)
+        ctx.drawImage(pBack2, 0, 0, displayWidth, displayHeight)
+        ctx.drawImage(pBack3, 0, 0, displayWidth, displayHeight)
+        ctx.drawImage(pBack4, 0, 0, displayWidth, displayHeight)
 
-        bottomWalls.forEach(wall =>{
-            ctx.fillStyle="#2D2D2D"
-            ctx.fillRect(wall.x,wall.y-cameraY,wall.width,wall.height)
+        ctx.fillStyle = "#A8E6CF"
+        ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, maxWorldHeight)
+        ctx.fillRect(rightWallX - 4, 0 - cameraY, 8, maxWorldHeight)
+
+        bottomWalls.forEach(wall => {
+            ctx.fillStyle = "#2D2D2D"
+            ctx.fillRect(wall.x, wall.y - cameraY, wall.width, wall.height)
         })
 
-        multipliers.forEach(multi=>{
-            ctx.globalAlpha=0.5
+        multipliers.forEach(multi => {
+            ctx.globalAlpha = 0.5
             ctx.font = '20px "Press Start 2P"'
-            ctx.fillStyle="#2D2D2D"
-            ctx.fillText(multi.text,multi.textX,multi.textY)
-            ctx.globalAlpha=1.0
+            ctx.fillStyle = "#2D2D2D"
+            ctx.fillText(multi.text, multi.textX, multi.textY)
+            ctx.globalAlpha = 1.0
         })
 
-        ctx.fillStyle="#2D2D2D"
-        ctx.fillRect(199,maxWorldHeight-cameraY-48,2,48)
+        ctx.fillStyle = "#2D2D2D"
+        ctx.fillRect(199, maxWorldHeight - cameraY - 48, 2, 48)
 
         pegs.forEach(peg => {
-            if (pegImg.complete && peg.hit==false) {
-                ctx.drawImage(pegImg, peg.x, peg.y-cameraY, peg.radius * 2, peg.radius * 2)
-            } else if(hitPegImg.complete && peg.hit==true){
-                ctx.drawImage(hitPegImg, peg.x,peg.y-cameraY,peg.radius*2,peg.radius*2)
+            if (pegImg.complete && peg.hit == false) {
+                ctx.drawImage(pegImg, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
+            } else if (hitPegImg.complete && peg.hit == true) {
+                ctx.drawImage(hitPegImg, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
             }
 
         })
-        if(coinImg.complete){
-            ctx.globalAlpha=0.5
-            ctx.drawImage(coinImg,ghostCoin.x-ghostCoin.radius,(ghostCoin.y-ghostCoin.radius)-cameraY,ghostCoin.radius*2,ghostCoin.radius*2)
-            ctx.globalAlpha=1.0
+        if (coinImg.complete) {
+            ctx.globalAlpha = 0.5
+            ctx.drawImage(coinImg, ghostCoin.x - ghostCoin.radius, (ghostCoin.y - ghostCoin.radius) - cameraY, ghostCoin.radius * 2, ghostCoin.radius * 2)
+            ctx.globalAlpha = 1.0
         }
-        coins.forEach(coin=>{
-            if(coinImg.complete){
-                ctx.drawImage(coinImg,coin.x-coin.radius,(coin.y-coin.radius)-cameraY,coin.radius*2,coin.radius*2)
+        coins.forEach(coin => {
+            if (coinImg.complete) {
+                ctx.drawImage(coinImg, coin.x - coin.radius, (coin.y - coin.radius) - cameraY, coin.radius * 2, coin.radius * 2)
             }
         })
-        ctx.globalAlpha=0.6
+        ctx.globalAlpha = 0.6
         ctx.font = '40px "Press Start 2P"'
         ctx.textAlign = "center"
         ctx.textBaseline = "left"
         ctx.fillStyle = "#F9F7F1"
-        ctx.fillText(score,100,25)
-        ctx.globalAlpha=1.0
+        ctx.fillText(totalScore, 100, 25)
+        ctx.globalAlpha = 1.0
     }
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
