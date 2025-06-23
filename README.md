@@ -22,7 +22,7 @@ Coming Soon...
 Clone the repo and install dependencies:
 
 '''bash
-git clone https://github/mendezc0251/RoguliteJamboree
-cd /frontend
-npm install
-npm run dev
+- git clone https://github/mendezc0251/RoguliteJamboree
+- cd /frontend
+- npm install
+- npm run dev
