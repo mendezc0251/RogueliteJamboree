@@ -168,33 +168,35 @@ export function initCanvas(canvas) {
         if (coin.y - coin.radius < cameraY + displayHeight) {
             return true
         }
-        else {
+        else{
             console.log(score+" Before multiplier")
-            multiScore(coin.x)
+            multiScore(coin)
             console.log(score+" After multiplier")
             pegs.forEach(peg => {
                 if (peg.hit == true) {
                     peg.hit = false
                 }
             })
-            
-            multipliers.forEach(multi => {
-                multi["text"] = multiplier[Math.floor(Math.random() * multiplier.length)]
-            })
+            if(coin.scored==true){
+                multipliers.forEach(multi => {
+                    multi["text"] = multiplier[Math.floor(Math.random() * multiplier.length)]
+                })
+            }   
             totalScore+=score
             score=0
             return false
         }
     }
-//Todo: fix bug in multiScore being called for 2 frames and detection of coins x being innacurate
 function multiScore(c){
-    console.log(c)
-    multipliers.forEach(multi=>{
-        if(c>multi.x && c<multi.x+80){
-            console.log(parseFloat((""+multi.text).slice(1)))
-            score=score*Math.floor(parseFloat((""+multi.text).slice(1)))
-        }
-    })
+    if(c.scored==false){
+        c.scored=true
+        multipliers.forEach(multi=>{
+            if(c.x>multi.x && c.x<multi.x+80){
+                console.log(parseFloat((""+multi.text).slice(1)))
+                score=Math.floor(score*parseFloat((""+multi.text).slice(1)))
+            }
+        })
+    }
 }
 
     canvas.addEventListener("mousemove", function (event) {
@@ -366,7 +368,9 @@ function multiScore(c){
                     vx: 0,
                     vy: 0,
                     gravity: 0.5,
-                    bounceFactor: 0.7
+                    bounceFactor: 0.7,
+                    filtered:false,
+                    scored:false,
                 })
 
                 ammo -= 1
