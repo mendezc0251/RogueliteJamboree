@@ -4,9 +4,9 @@ Come one come all to the roguelite jamboree and experience wacky hijinxs in the 
 
 ## Features
 
--Rounds of gameplay with increasing difficulty
--Meta progression through the Shop
--Login/Signup to save progression
+- Rounds of gameplay with increasing difficulty
+- Meta progression through the Shop
+- Login/Signup to save progression
 
 ## Demo
 
@@ -14,8 +14,8 @@ Coming Soon...
 
 ## Tech Stack
 
--**Frontend:** React + Vite
--**Backend:** Coming Soon...
+- **Frontend:** React + Vite
+- **Backend:** Coming Soon...
 
 ## Getting Started
 
