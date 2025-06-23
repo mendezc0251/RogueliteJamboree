@@ -54,6 +54,9 @@ export function initCanvas(canvas) {
         else if (currentScene === "pachinko") {
             updatePachinko()
         }
+        else if (currentScene === "upgradePachinko") {
+            updateUpgradePachinko()
+        }
         else if (currentScene === "slots") {
             updateSlots()
         }
@@ -212,6 +215,7 @@ function multiScore(c){
                 console.log("Game Over")
             }
             else {
+                currentScene=="upgradePachinko"
                 console.log("ROUND OVER!")
                 round += 1
                 console.log(round)
@@ -298,6 +302,8 @@ function multiScore(c){
         coins = coins.filter(resetBoard)
     }
 
+    function updateUpgradePachinko(){}
+
     function updateSlots() {
 
     }
@@ -315,6 +321,9 @@ function multiScore(c){
         }
         else if (currentScene === "pachinko") {
             renderPachinko()
+        }
+        else if (currentScene === "upgradePachinko") {
+            renderUpgradePachinko()
         }
         else if (currentScene === "slots") {
             renderSlots()
@@ -516,6 +525,9 @@ function multiScore(c){
         ctx.fillStyle = "#F9F7F1"
         ctx.fillText(totalScore, 100, 25)
         ctx.globalAlpha = 1.0
+    }
+    function renderUpgradePachinko(){
+
     }
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
