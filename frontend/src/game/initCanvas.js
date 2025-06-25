@@ -150,8 +150,8 @@ export function initCanvas(canvas) {
     ]
 
     multipliers.forEach(multi => {
-                multi.text = multiplier[Math.floor(Math.random() * multiplier.length)]
-            })
+        multi.text = multiplier[Math.floor(Math.random() * multiplier.length)]
+    })
 
     let round = 1
     let rounds = 5
@@ -171,36 +171,36 @@ export function initCanvas(canvas) {
         if (coin.y - coin.radius < cameraY + displayHeight) {
             return true
         }
-        else{
-            console.log(score+" Before multiplier")
+        else {
+            console.log(score + " Before multiplier")
             multiScore(coin)
-            console.log(score+" After multiplier")
+            console.log(score + " After multiplier")
             pegs.forEach(peg => {
                 if (peg.hit == true) {
                     peg.hit = false
                 }
             })
-            if(coin.scored==true){
+            if (coin.scored == true) {
                 multipliers.forEach(multi => {
                     multi["text"] = multiplier[Math.floor(Math.random() * multiplier.length)]
                 })
-            }   
-            totalScore+=score
-            score=0
+            }
+            totalScore += score
+            score = 0
             return false
         }
     }
-function multiScore(c){
-    if(c.scored==false){
-        c.scored=true
-        multipliers.forEach(multi=>{
-            if(c.x>multi.x && c.x<multi.x+80){
-                console.log(parseFloat((""+multi.text).slice(1)))
-                score=Math.floor(score*parseFloat((""+multi.text).slice(1)))
-            }
-        })
+    function multiScore(c) {
+        if (c.scored == false) {
+            c.scored = true
+            multipliers.forEach(multi => {
+                if (c.x > multi.x && c.x < multi.x + 80) {
+                    console.log(parseFloat(("" + multi.text).slice(1)))
+                    score = Math.floor(score * parseFloat(("" + multi.text).slice(1)))
+                }
+            })
+        }
     }
-}
 
     canvas.addEventListener("mousemove", function (event) {
         const rect = canvas.getBoundingClientRect()
@@ -215,10 +215,13 @@ function multiScore(c){
                 console.log("Game Over")
             }
             else {
-                currentScene=="upgradePachinko"
+                upgradeButtons.forEach(button => {
+                    button.text = upgrades[Math.floor(Math.random() * multiplier.length)].text
+                })
+                currentScene = "upgradePachinko"
                 console.log("ROUND OVER!")
                 round += 1
-                console.log(round)
+                console.log("Round " + round + " begin!")
                 ammo += 2
             }
         }
@@ -302,7 +305,12 @@ function multiScore(c){
         coins = coins.filter(resetBoard)
     }
 
-    function updateUpgradePachinko(){}
+    function updateUpgradePachinko() { 
+        upgradeButtons.forEach(button => {
+            button.isHovered = mouseX >= button.x && mouseX <= button.x + button.width
+                && mouseY >= button.y && mouseY <= button.y + button.height
+        })
+    }
 
     function updateSlots() {
 
@@ -324,6 +332,7 @@ function multiScore(c){
         }
         else if (currentScene === "upgradePachinko") {
             renderUpgradePachinko()
+            updateUpgradePachinko()
         }
         else if (currentScene === "slots") {
             renderSlots()
@@ -378,12 +387,21 @@ function multiScore(c){
                     vy: 0,
                     gravity: 0.5,
                     bounceFactor: 0.7,
-                    filtered:false,
-                    scored:false,
+                    filtered: false,
+                    scored: false,
                 })
 
                 ammo -= 1
             }
+        }
+        else if (currentScene==="upgradePachinko"){
+            upgradeButtons.forEach(button=>{
+                const withinX = mouseX >= button.x && mouseX <= button.x + button.width
+                const withinY = mouseY >= button.y && mouseY <= button.y + button.height
+                if (withinX && withinY) {
+                    button.onClick()
+                }
+            })
         }
     }
     // render function for the Menu
@@ -528,29 +546,27 @@ function multiScore(c){
     }
 
     const upgrades = [
-        {text:"+1 Ball",description:"Adds a ball to the drop"},
-        {text:"Bouncier coins!", description:"Adds more bounce to coins"},
-        {text:"High risk! High reward!", description:"Adds higher chance to get .5x and 2x multipliers"},
-        {text:"+2 rows", description:"Adds another row to the Pachinko board"},
-        {text:"Reinforced pegs",description:"Allows a ball to score twice on the same peg"},
+        { text: "+1 Ball", description: "Adds a ball to the drop" },
+        { text: "Bouncier coins!", description: "Adds more bounce to coins" },
+        { text: "High risk! High reward!", description: "Adds higher chance to get .5x and 2x multipliers" },
+        { text: "+2 rows", description: "Adds another row to the Pachinko board" },
+        { text: "Reinforced pegs", description: "Allows a ball to score twice on the same peg" },
     ]
-    function renderUpgradePachinko(){
-        let upgradeButtons=[
-            {text:null,description:null,x:displayWidth * (1 / 6) - 150,y:(displayHeight / 2) - 150},
-            {text:null,description:null,x:displayWidth * (3 / 6) - 150,y:(displayHeight / 2) - 150},
-            {text:null,description:null,x:displayWidth * (5 / 6) - 150,y:(displayHeight / 2) - 150},
-        ]
-
+    let upgradeButtons = [
+        { text: null, description: null, x: displayWidth * (1 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
+        { text: null, description: null, x: displayWidth * (3 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
+        { text: null, description: null, x: displayWidth * (5 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
+    ]
+    function renderUpgradePachinko() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
 
         ctx.fillStyle = "#2D2D2D"
         ctx.fillRect(0, 0, displayWidth, displayHeight)
 
         upgradeButtons.forEach(button => {
-            button.text = 
             ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
             ctx.fillRect(button.x, button.y, button.width, button.height)
-            ctx.font = '18px "Press Start 2P"'
+            ctx.font = '15px "Press Start 2P"'
             ctx.textAlign = "center"
             ctx.textBaseline = "middle"
             ctx.fillStyle = "#F9F7F1"
