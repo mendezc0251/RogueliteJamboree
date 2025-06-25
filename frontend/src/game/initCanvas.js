@@ -526,8 +526,36 @@ function multiScore(c){
         ctx.fillText(totalScore, 100, 25)
         ctx.globalAlpha = 1.0
     }
-    function renderUpgradePachinko(){
 
+    const upgrades = [
+        {text:"+1 Ball",description:"Adds a ball to the drop"},
+        {text:"Bouncier coins!", description:"Adds more bounce to coins"},
+        {text:"High risk! High reward!", description:"Adds higher chance to get .5x and 2x multipliers"},
+        {text:"+2 rows", description:"Adds another row to the Pachinko board"},
+        {text:"Reinforced pegs",description:"Allows a ball to score twice on the same peg"},
+    ]
+    function renderUpgradePachinko(){
+        let upgradeButtons=[
+            {text:null,description:null,x:displayWidth * (1 / 6) - 150,y:(displayHeight / 2) - 150},
+            {text:null,description:null,x:displayWidth * (3 / 6) - 150,y:(displayHeight / 2) - 150},
+            {text:null,description:null,x:displayWidth * (5 / 6) - 150,y:(displayHeight / 2) - 150},
+        ]
+
+        ctx.clearRect(0, 0, displayWidth, displayHeight)
+
+        ctx.fillStyle = "#2D2D2D"
+        ctx.fillRect(0, 0, displayWidth, displayHeight)
+
+        upgradeButtons.forEach(button => {
+            button.text = 
+            ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
+            ctx.fillRect(button.x, button.y, button.width, button.height)
+            ctx.font = '18px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(button.text, button.x + 150, button.y - 50)
+        })
     }
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
