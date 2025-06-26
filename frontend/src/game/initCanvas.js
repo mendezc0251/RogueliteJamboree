@@ -7,7 +7,9 @@ import pBackImg2 from '../assets/cloud2.png'
 import pBackImg3 from '../assets/cloud3.png'
 import pBackImg4 from '../assets/cloud4.png'
 
+console.log("initCanvas called")
 export function initCanvas(canvas) {
+    let currentScene = "menu";
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     canvas.style.imageRendering = 'pixelated'
@@ -42,7 +44,7 @@ export function initCanvas(canvas) {
         mouseY = event.clientY - rect.top
     })
 
-    let currentScene = "menu";
+    
 
     function update() {
         if (currentScene === "menu") {
@@ -209,22 +211,28 @@ export function initCanvas(canvas) {
         ghostCoin.x = Math.max(dropZone.xMin + ghostCoin.radius, Math.min(dropZone.xMax + ghostCoin.radius, mouseX))
     })
 
+    let roundEnded = false
     function updatePachinko() {
-        if (ammo == 0 && coins == 0) {
+        if (ammo == 0 && coins == 0 && !roundEnded) {
+            roundEnded=true
             if (round == rounds) {
                 console.log("Game Over")
             }
             else {
-                upgradeButtons.forEach(button => {
-                    button.text = upgrades[Math.floor(Math.random() * multiplier.length)].text
-                })
-                currentScene = "upgradePachinko"
-                console.log("ROUND OVER!")
-                round += 1
-                console.log("Round " + round + " begin!")
-                ammo += 2
+                if(currentScene!=="upgradePachinko") {
+                    upgradeButtons.forEach(button => {
+                        let i = Math.floor(Math.random() * multiplier.length)
+                        button.text = upgrades[i].text
+                        button.onClick = upgrades[i].onClick
+                    })
+                    currentScene = "upgradePachinko"
+                    console.log("ROUND OVER!")
+                    round += 1
+                    console.log("Round " + round + " begin!")
+                    ammo += 2
             }
         }
+    }
         coins.forEach(coin => {
             coin.vy += coin.gravity
 
@@ -305,7 +313,28 @@ export function initCanvas(canvas) {
         coins = coins.filter(resetBoard)
     }
 
-    function updateUpgradePachinko() { 
+    // function tied to the +1 ball upgrade
+    function addBall() {
+        console.log("Ball added!")
+    }
+
+    function addBounce() {
+        console.log("Bounce added!")
+    }
+
+    function highRiskReward() {
+        console.log("Multiplier pool loaded!")
+    }
+
+    function addRows() {
+        console.log("Rows added to game board!")
+    }
+
+    function morePegHits() {
+        console.log("Peg's reinforced!")
+    }
+
+    function updateUpgradePachinko() {
         upgradeButtons.forEach(button => {
             button.isHovered = mouseX >= button.x && mouseX <= button.x + button.width
                 && mouseY >= button.y && mouseY <= button.y + button.height
@@ -332,7 +361,6 @@ export function initCanvas(canvas) {
         }
         else if (currentScene === "upgradePachinko") {
             renderUpgradePachinko()
-            updateUpgradePachinko()
         }
         else if (currentScene === "slots") {
             renderSlots()
@@ -377,6 +405,7 @@ export function initCanvas(canvas) {
             })
         }
         else if (currentScene === "pachinko") {
+            
             if (coins.length <= 0 && ammo != 0) {
 
                 coins.push({
@@ -392,14 +421,17 @@ export function initCanvas(canvas) {
                 })
 
                 ammo -= 1
+                roundEnded=false
             }
         }
-        else if (currentScene==="upgradePachinko"){
-            upgradeButtons.forEach(button=>{
+        else if (currentScene === "upgradePachinko") {
+            upgradeButtons.forEach(button => {
                 const withinX = mouseX >= button.x && mouseX <= button.x + button.width
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
                     button.onClick()
+                    currentScene="pachinko"
+                    button.onClick = null
                 }
             })
         }
@@ -439,7 +471,7 @@ export function initCanvas(canvas) {
 
 
     }
-
+    // array with buttons corresponding to the gamemode
     const charButtons = [
         { text: "Capy's Coin Waterfall", x: displayWidth * (1 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
         { text: "Croc's Chaotic Slots", x: displayWidth * (3 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "slots" },
@@ -464,7 +496,7 @@ export function initCanvas(canvas) {
         })
     }
 
-
+    // creating Image objects and setting source directory
     const coinImg = new Image()
     coinImg.src = coinImgSrc
 
@@ -544,19 +576,21 @@ export function initCanvas(canvas) {
         ctx.fillText(totalScore, 100, 25)
         ctx.globalAlpha = 1.0
     }
-
+    // array that holds all available upgrades
     const upgrades = [
-        { text: "+1 Ball", description: "Adds a ball to the drop" },
-        { text: "Bouncier coins!", description: "Adds more bounce to coins" },
-        { text: "High risk! High reward!", description: "Adds higher chance to get .5x and 2x multipliers" },
-        { text: "+2 rows", description: "Adds another row to the Pachinko board" },
-        { text: "Reinforced pegs", description: "Allows a ball to score twice on the same peg" },
+        { text: "+1 Ball", description: "Adds a ball to the drop", onClick: addBall },
+        { text: "Bouncier coins!", description: "Adds more bounce to coins", onClick: addBounce },
+        { text: "High risk! High reward!", description: "Adds higher chance to get .5x and 2x multipliers", onClick: highRiskReward },
+        { text: "+2 rows", description: "Adds another row to the Pachinko board", onClick: addRows },
+        { text: "Reinforced pegs", description: "Allows a ball to score twice on the same peg", onClick: morePegHits },
     ]
+    // array to hold upgrades offered to the player
     let upgradeButtons = [
-        { text: null, description: null, x: displayWidth * (1 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
-        { text: null, description: null, x: displayWidth * (3 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
-        { text: null, description: null, x: displayWidth * (5 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: () => currentScene = "pachinko" },
+        { text: null, description: null, x: displayWidth * (1 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: null },
+        { text: null, description: null, x: displayWidth * (3 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: null },
+        { text: null, description: null, x: displayWidth * (5 / 6) - 150, y: (displayHeight / 2) - 150, width: 300, height: 300, isHovered: false, onClick: null },
     ]
+    // renders the upgrade screen after each round
     function renderUpgradePachinko() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
 
@@ -579,12 +613,12 @@ export function initCanvas(canvas) {
     function renderChess() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
     }
-
+    // TODO: fix bugs invlovling double execution of functions
     function gameLoop() {
         update()
         render()
         requestAnimationFrame(gameLoop)
     }
-    gameLoop()
+    requestAnimationFrame(gameLoop)
 
 }
