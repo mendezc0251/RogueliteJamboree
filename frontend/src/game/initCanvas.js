@@ -1,10 +1,18 @@
 import GameLoop from '../game/GameLoop'
 import { events } from './Events'
 import { resources } from "./Resources"
+import { GameObject } from './GameObject'
 
 console.log("initCanvas called")
 export function initCanvas(canvas) {
-    let currentScene = "menu";
+    if(window.__gameInitialized){
+        console.warn("initCanvas called more than once!")
+        return
+    }
+    window.__gameInitialized = true
+    let currentScene = "pachinko";
+    let hasHandledRoundEnd = false;
+    let roundEnded = false;
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     canvas.style.imageRendering = 'pixelated'
@@ -23,6 +31,11 @@ export function initCanvas(canvas) {
 
     let mouseX = 0
     let mouseY = 0
+    //TODO: Create sprite class to add children to menuScene GameObject
+    const menuScene = new GameObject({
+        position: { x: 0, y: 0 }
+    });
+
 
     // Track mouse clicks
     canvas.addEventListener("click", function (event) {
@@ -199,6 +212,26 @@ export function initCanvas(canvas) {
         }
     }
 
+    function handleRoundEnd() {
+        console.log("Round end!")
+        if (round == rounds) {
+            console.log("Game Over!")
+        } else {
+            if (currentScene !== "upgradePachinko") {
+                upgradeButtons.forEach(button => {
+                    let i = Math.floor(Math.random() * multiplier.length)
+                    button.text = upgrades[i].text
+                    button.onClick = upgrades[i].onClick
+                })
+                currentScene = "upgradePachinko"
+                console.log("ROUND OVER!")
+                round += 1
+                console.log("Round " + round + " begin!")
+                ammo += 2
+            }
+        }
+    }
+
     canvas.addEventListener("mousemove", function (event) {
         const rect = canvas.getBoundingClientRect()
         let mouseX = event.clientX - rect.left
@@ -206,28 +239,16 @@ export function initCanvas(canvas) {
         ghostCoin.x = Math.max(dropZone.xMin + ghostCoin.radius, Math.min(dropZone.xMax + ghostCoin.radius, mouseX))
     })
 
-    let roundEnded = false
+
     function updatePachinko() {
-        if (ammo == 0 && coins == 0 && !roundEnded) {
+        if (ammo == 0 && coins.length == 0 && !roundEnded) {
             roundEnded = true
-            if (round == rounds) {
-                console.log("Game Over")
-            }
-            else {
-                if (currentScene !== "upgradePachinko") {
-                    upgradeButtons.forEach(button => {
-                        let i = Math.floor(Math.random() * multiplier.length)
-                        button.text = upgrades[i].text
-                        button.onClick = upgrades[i].onClick
-                    })
-                    currentScene = "upgradePachinko"
-                    console.log("ROUND OVER!")
-                    round += 1
-                    console.log("Round " + round + " begin!")
-                    ammo += 2
-                }
+            if(!hasHandledRoundEnd){
+                hasHandledRoundEnd=true;
+                handleRoundEnd();
             }
         }
+
         coins.forEach(coin => {
             coin.vy += coin.gravity
 
@@ -515,16 +536,16 @@ export function initCanvas(canvas) {
         if (pBack1.isLoaded) {
             ctx.drawImage(pBack1.image, 0, 0, displayWidth, displayHeight)
         }
-        if(pBack2.isLoaded){
+        if (pBack2.isLoaded) {
             ctx.drawImage(pBack2.image, 0, 0, displayWidth, displayHeight)
         }
-        if(pBack3.isLoaded){
+        if (pBack3.isLoaded) {
             ctx.drawImage(pBack3.image, 0, 0, displayWidth, displayHeight)
         }
-        if(pBack4.isLoaded){
+        if (pBack4.isLoaded) {
             ctx.drawImage(pBack4.image, 0, 0, displayWidth, displayHeight)
         }
-        
+
 
         ctx.fillStyle = "#A8E6CF"
         ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, maxWorldHeight)
