@@ -1,11 +1,6 @@
-import headerBacking from '../assets/HeaderA.png'
-import pegImgSrc from '../assets/Peg.png'
-import hitPegImgSrc from '../assets/PegHit.png'
-import coinImgSrc from '../assets/Coin.png'
-import pBackImg1 from '../assets/cloud1.png'
-import pBackImg2 from '../assets/cloud2.png'
-import pBackImg3 from '../assets/cloud3.png'
-import pBackImg4 from '../assets/cloud4.png'
+import GameLoop from '../game/GameLoop'
+import { events } from './Events'
+import { resources } from "./Resources"
 
 console.log("initCanvas called")
 export function initCanvas(canvas) {
@@ -44,7 +39,7 @@ export function initCanvas(canvas) {
         mouseY = event.clientY - rect.top
     })
 
-    
+
 
     function update() {
         if (currentScene === "menu") {
@@ -214,12 +209,12 @@ export function initCanvas(canvas) {
     let roundEnded = false
     function updatePachinko() {
         if (ammo == 0 && coins == 0 && !roundEnded) {
-            roundEnded=true
+            roundEnded = true
             if (round == rounds) {
                 console.log("Game Over")
             }
             else {
-                if(currentScene!=="upgradePachinko") {
+                if (currentScene !== "upgradePachinko") {
                     upgradeButtons.forEach(button => {
                         let i = Math.floor(Math.random() * multiplier.length)
                         button.text = upgrades[i].text
@@ -230,9 +225,9 @@ export function initCanvas(canvas) {
                     round += 1
                     console.log("Round " + round + " begin!")
                     ammo += 2
+                }
             }
         }
-    }
         coins.forEach(coin => {
             coin.vy += coin.gravity
 
@@ -369,9 +364,8 @@ export function initCanvas(canvas) {
             renderChess()
         }
     }
-    // Instantiate header image
-    const headerBack = new Image()
-    headerBack.src = headerBacking
+    // load header image
+    const headerBack = resources.images.headerBack;
 
     //Set button width and location on canvas
     const buttonWidth = displayWidth * 0.3 //20% width button
@@ -385,6 +379,10 @@ export function initCanvas(canvas) {
     ]
 
     // function to look for mouse click on buttons
+    events.on("playClick", currentScene, buttons.forEach(button => {
+
+    }))
+
     function handleClick(mouseX, mouseY) {
         if (currentScene === "menu") {
             buttons.forEach(button => {
@@ -405,7 +403,7 @@ export function initCanvas(canvas) {
             })
         }
         else if (currentScene === "pachinko") {
-            
+
             if (coins.length <= 0 && ammo != 0) {
 
                 coins.push({
@@ -421,7 +419,7 @@ export function initCanvas(canvas) {
                 })
 
                 ammo -= 1
-                roundEnded=false
+                roundEnded = false
             }
         }
         else if (currentScene === "upgradePachinko") {
@@ -430,7 +428,7 @@ export function initCanvas(canvas) {
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
                     button.onClick()
-                    currentScene="pachinko"
+                    currentScene = "pachinko"
                     button.onClick = null
                 }
             })
@@ -447,8 +445,9 @@ export function initCanvas(canvas) {
 
         const scale = 1
 
-        if (headerBack.complete) {
-            ctx.drawImage(headerBack, (displayWidth - headerBack.width * scale) * 0.5, (displayHeight - headerBack.height * scale) * 0.15, headerBack.width * scale, headerBack.height * scale)
+
+        if (headerBack.isLoaded) {
+            ctx.drawImage(headerBack.image, (displayWidth - headerBack.image.width * scale) * 0.5, (displayHeight - headerBack.image.height * scale) * 0.15, headerBack.image.width * scale, headerBack.image.height * scale)
         }
 
         buttons.forEach(button => {
@@ -497,26 +496,15 @@ export function initCanvas(canvas) {
     }
 
     // creating Image objects and setting source directory
-    const coinImg = new Image()
-    coinImg.src = coinImgSrc
+    const coinImg = resources.images.coin
 
-    const pegImg = new Image()
-    pegImg.src = pegImgSrc
+    const pegImg = resources.images.peg
 
-    const hitPegImg = new Image()
-    hitPegImg.src = hitPegImgSrc
-
-    const pBack1 = new Image()
-    pBack1.src = pBackImg1
-
-    const pBack2 = new Image()
-    pBack2.src = pBackImg2
-
-    const pBack3 = new Image()
-    pBack3.src = pBackImg3
-
-    const pBack4 = new Image()
-    pBack4.src = pBackImg4
+    const hitPegImg = resources.images.hitPeg
+    const pBack1 = resources.images.pBackImg1
+    const pBack2 = resources.images.pBackImg2
+    const pBack3 = resources.images.pBackImg3
+    const pBack4 = resources.images.pBackImg4
 
     // render Pachinko game
     function renderPachinko() {
@@ -524,11 +512,19 @@ export function initCanvas(canvas) {
 
 
 
-
-        ctx.drawImage(pBack1, 0, 0, displayWidth, displayHeight)
-        ctx.drawImage(pBack2, 0, 0, displayWidth, displayHeight)
-        ctx.drawImage(pBack3, 0, 0, displayWidth, displayHeight)
-        ctx.drawImage(pBack4, 0, 0, displayWidth, displayHeight)
+        if (pBack1.isLoaded) {
+            ctx.drawImage(pBack1.image, 0, 0, displayWidth, displayHeight)
+        }
+        if(pBack2.isLoaded){
+            ctx.drawImage(pBack2.image, 0, 0, displayWidth, displayHeight)
+        }
+        if(pBack3.isLoaded){
+            ctx.drawImage(pBack3.image, 0, 0, displayWidth, displayHeight)
+        }
+        if(pBack4.isLoaded){
+            ctx.drawImage(pBack4.image, 0, 0, displayWidth, displayHeight)
+        }
+        
 
         ctx.fillStyle = "#A8E6CF"
         ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, maxWorldHeight)
@@ -551,21 +547,21 @@ export function initCanvas(canvas) {
         ctx.fillRect(199, maxWorldHeight - cameraY - 48, 2, 48)
 
         pegs.forEach(peg => {
-            if (pegImg.complete && peg.hit == false) {
-                ctx.drawImage(pegImg, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
-            } else if (hitPegImg.complete && peg.hit == true) {
-                ctx.drawImage(hitPegImg, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
+            if (pegImg.isLoaded && peg.hit == false) {
+                ctx.drawImage(pegImg.image, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
+            } else if (hitPegImg.isLoaded && peg.hit == true) {
+                ctx.drawImage(hitPegImg.image, peg.x, peg.y - cameraY, peg.radius * 2, peg.radius * 2)
             }
 
         })
-        if (coinImg.complete) {
+        if (coinImg.isLoaded) {
             ctx.globalAlpha = 0.5
-            ctx.drawImage(coinImg, ghostCoin.x - ghostCoin.radius, (ghostCoin.y - ghostCoin.radius) - cameraY, ghostCoin.radius * 2, ghostCoin.radius * 2)
+            ctx.drawImage(coinImg.image, ghostCoin.x - ghostCoin.radius, (ghostCoin.y - ghostCoin.radius) - cameraY, ghostCoin.radius * 2, ghostCoin.radius * 2)
             ctx.globalAlpha = 1.0
         }
         coins.forEach(coin => {
-            if (coinImg.complete) {
-                ctx.drawImage(coinImg, coin.x - coin.radius, (coin.y - coin.radius) - cameraY, coin.radius * 2, coin.radius * 2)
+            if (coinImg.isLoaded) {
+                ctx.drawImage(coinImg.image, coin.x - coin.radius, (coin.y - coin.radius) - cameraY, coin.radius * 2, coin.radius * 2)
             }
         })
         ctx.globalAlpha = 0.6
@@ -614,11 +610,6 @@ export function initCanvas(canvas) {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
     }
     // TODO: fix bugs invlovling double execution of functions
-    function gameLoop() {
-        update()
-        render()
-        requestAnimationFrame(gameLoop)
-    }
-    requestAnimationFrame(gameLoop)
-
+    const gameLoop = new GameLoop(update, render)
+    gameLoop.start()
 }
