@@ -10,9 +10,7 @@ export function initCanvas(canvas) {
         return
     }
     window.__gameInitialized = true
-    let currentScene = "pachinko";
-    let hasHandledRoundEnd = false;
-    let roundEnded = false;
+    let currentScene = "menu";
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     canvas.style.imageRendering = 'pixelated'
@@ -213,22 +211,19 @@ export function initCanvas(canvas) {
     }
 
     function handleRoundEnd() {
-        console.log("Round end!")
         if (round == rounds) {
             console.log("Game Over!")
         } else {
-            if (currentScene !== "upgradePachinko") {
                 upgradeButtons.forEach(button => {
-                    let i = Math.floor(Math.random() * multiplier.length)
+                    let i = Math.floor(Math.random() * upgrades.length)
                     button.text = upgrades[i].text
                     button.onClick = upgrades[i].onClick
                 })
-                currentScene = "upgradePachinko"
                 console.log("ROUND OVER!")
                 round += 1
                 console.log("Round " + round + " begin!")
                 ammo += 2
-            }
+                currentScene = "upgradePachinko"
         }
     }
 
@@ -241,12 +236,8 @@ export function initCanvas(canvas) {
 
 
     function updatePachinko() {
-        if (ammo == 0 && coins.length == 0 && !roundEnded) {
-            roundEnded = true
-            if(!hasHandledRoundEnd){
-                hasHandledRoundEnd=true;
-                handleRoundEnd();
-            }
+        if (ammo == 0 && coins.length == 0) {
+            handleRoundEnd();
         }
 
         coins.forEach(coin => {
@@ -333,12 +324,17 @@ export function initCanvas(canvas) {
     function addBall() {
         console.log("Ball added!")
     }
-
+    let bounceLevel = 0;
     function addBounce() {
-        console.log("Bounce added!")
+        bounceLevel+=1
+        let bounceFactor = 1-0.5*Math.exp(-0.2*bounceLevel)
+        bfNum = bounceFactor
+        console.log("Bounce added",bfNum)
     }
 
     function highRiskReward() {
+        multiplier.push("x2")
+        multiplier.push("x.5")
         console.log("Multiplier pool loaded!")
     }
 
@@ -404,6 +400,7 @@ export function initCanvas(canvas) {
 
     }))
 
+    let bfNum = 0.5
     function handleClick(mouseX, mouseY) {
         if (currentScene === "menu") {
             buttons.forEach(button => {
@@ -434,13 +431,11 @@ export function initCanvas(canvas) {
                     vx: 0,
                     vy: 0,
                     gravity: 0.5,
-                    bounceFactor: 0.7,
+                    bounceFactor: bfNum,
                     filtered: false,
                     scored: false,
                 })
-
                 ammo -= 1
-                roundEnded = false
             }
         }
         else if (currentScene === "upgradePachinko") {
