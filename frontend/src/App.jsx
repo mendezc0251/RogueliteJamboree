@@ -1,5 +1,5 @@
 import './App.css'
-import jamboreePng from '../src/assets/jamboree.png'
+import jamboreePng from '/assets/jamboree.png'
 import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
 import Game from './Game'
 import Shop from './Shop'
