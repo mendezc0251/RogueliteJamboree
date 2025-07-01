@@ -2,6 +2,7 @@ import GameLoop from '../game/GameLoop'
 import { events } from './Events'
 import { resources } from "./Resources"
 import { GameObject } from './GameObject'
+import { Upgrades } from './Upgrades'
 
 console.log("initCanvas called")
 export function initCanvas(canvas) {
@@ -91,11 +92,17 @@ export function initCanvas(canvas) {
 
     }
 
+    let gameState = {
+        bfNum:0.5,
+        multiplier:["x2", "x1", "x.5"],
+        coins:4,
+    }
+
     const leftWallX = 119
     const rightWallX = 1160
 
     let cameraY = 0
-    const maxWorldHeight = 1200
+    let maxWorldHeight = 1200
     // instantiate coins array and ammo
     let coins = []
     let ammo = 2
@@ -158,7 +165,7 @@ export function initCanvas(canvas) {
     ]
 
     multipliers.forEach(multi => {
-        multi.text = multiplier[Math.floor(Math.random() * multiplier.length)]
+        multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
     })
 
     let round = 1
@@ -190,7 +197,7 @@ export function initCanvas(canvas) {
             })
             if (coin.scored == true) {
                 multipliers.forEach(multi => {
-                    multi["text"] = multiplier[Math.floor(Math.random() * multiplier.length)]
+                    multi["text"] = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
                 })
             }
             totalScore += score
@@ -214,11 +221,7 @@ export function initCanvas(canvas) {
         if (round == rounds) {
             console.log("Game Over!")
         } else {
-                upgradeButtons.forEach(button => {
-                    let i = Math.floor(Math.random() * upgrades.length)
-                    button.text = upgrades[i].text
-                    button.onClick = upgrades[i].onClick
-                })
+                upgradeButtonsArr = upgradesClass.getRandomUpgrades()
                 console.log("ROUND OVER!")
                 round += 1
                 console.log("Round " + round + " begin!")
@@ -233,6 +236,8 @@ export function initCanvas(canvas) {
 
         ghostCoin.x = Math.max(dropZone.xMin + ghostCoin.radius, Math.min(dropZone.xMax + ghostCoin.radius, mouseX))
     })
+
+    
 
 
     function updatePachinko() {
@@ -346,8 +351,13 @@ export function initCanvas(canvas) {
         console.log("Peg's reinforced!")
     }
 
+    let upgradesClass = new Upgrades(displayWidth,displayHeight,gameState)
+    let upgradeButtonsArr = upgradesClass.getRandomUpgrades()
+    
+
+    // update function for Pachinko upgrade scene
     function updateUpgradePachinko() {
-        upgradeButtons.forEach(button => {
+        upgradeButtonsArr.forEach(button => {
             button.isHovered = mouseX >= button.x && mouseX <= button.x + button.width
                 && mouseY >= button.y && mouseY <= button.y + button.height
         })
@@ -400,7 +410,6 @@ export function initCanvas(canvas) {
 
     }))
 
-    let bfNum = 0.5
     function handleClick(mouseX, mouseY) {
         if (currentScene === "menu") {
             buttons.forEach(button => {
@@ -423,23 +432,25 @@ export function initCanvas(canvas) {
         else if (currentScene === "pachinko") {
 
             if (coins.length <= 0 && ammo != 0) {
-
-                coins.push({
+                for(let i=1; i<=gameState.coins;i++){
+                    coins.push({
                     x: ghostCoin.x,
                     y: ghostCoin.y,
                     radius: 32,
                     vx: 0,
                     vy: 0,
                     gravity: 0.5,
-                    bounceFactor: bfNum,
+                    bounceFactor: gameState.bfNum,
                     filtered: false,
                     scored: false,
                 })
+                }
+                
                 ammo -= 1
             }
         }
         else if (currentScene === "upgradePachinko") {
-            upgradeButtons.forEach(button => {
+            upgradeButtonsArr.forEach(button => {
                 const withinX = mouseX >= button.x && mouseX <= button.x + button.width
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
@@ -609,7 +620,7 @@ export function initCanvas(canvas) {
         ctx.fillStyle = "#2D2D2D"
         ctx.fillRect(0, 0, displayWidth, displayHeight)
 
-        upgradeButtons.forEach(button => {
+        upgradeButtonsArr.forEach(button => {
             ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
             ctx.fillRect(button.x, button.y, button.width, button.height)
             ctx.font = '15px "Press Start 2P"'
