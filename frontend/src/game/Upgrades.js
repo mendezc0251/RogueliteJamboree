@@ -1,9 +1,36 @@
-class Upgrades {
+export class Upgrades {
 
-    constructor() {
+    constructor(displayWidth,displayHeight,gameState) {
+        this.gameState=gameState;
+        // function tied to the +1 ball upgrade
+        const addCoin = () => {
+            this.gameState.coins += 1
+            console.log("Ball added!")
+        }
+        let bounceLevel = 0;
+        const addBounce = () => {
+            bounceLevel += 1
+            let bounceFactor = 1 - 0.5 * Math.exp(-0.2 * bounceLevel)
+            this.gameState.bfNum = bounceFactor
+            console.log("Bounce added", this.gameState.bfNum)
+        }
+
+        const highRiskReward = () => {
+            this.gameState.multiplier.push("x2")
+            this.gameState.multiplier.push("x.5")
+            console.log("Multiplier pool loaded!")
+        }
+
+        const addRows = () => {
+            console.log("Rows added to game board!")
+        }
+
+        const morePegHits = () => {
+            console.log("Peg's reinforced!")
+        }
         // array that holds all available upgrades
         this.upgrades = [
-            { text: "+1 Ball", description: "Adds a ball to the drop", onClick: addBall },
+            { text: "+1 Ball", description: "Adds a extra coin to the drop", onClick: addCoin },
             { text: "Bouncier coins!", description: "Adds more bounce to coins", onClick: addBounce },
             { text: "High risk! High reward!", description: "Adds higher chance to get .5x and 2x multipliers", onClick: highRiskReward },
             { text: "+2 rows", description: "Adds another row to the Pachinko board", onClick: addRows },
