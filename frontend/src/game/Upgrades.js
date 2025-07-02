@@ -22,10 +22,13 @@ export class Upgrades {
         }
 
         const addRows = () => {
+            this.gameState.maxWorldHeight+=320
+            this.gameState.pegRows+=1
             console.log("Rows added to game board!")
         }
 
         const morePegHits = () => {
+            this.gameState.pegHits += 1
             console.log("Peg's reinforced!")
         }
         // array that holds all available upgrades

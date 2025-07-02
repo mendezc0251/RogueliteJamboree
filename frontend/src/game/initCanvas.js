@@ -90,19 +90,19 @@ export function initCanvas(canvas) {
     let gameState = {
         bfNum: 0.5,
         multiplier: ["x2", "x1", "x.5"],
-        coins: 4,
+        coins: 1,
+        pegHits: 1,
+        maxWorldHeight: 1200,
+        pegRows:3,
     }
 
     const leftWallX = 119
     const rightWallX = 1160
 
     let cameraY = 0
-    let maxWorldHeight = 1200
     // instantiate coins array and ammo
     let coins = []
-    let ammo = 2
-    // instantiate peg object
-    let pegAmount = 1
+    let ammo = 1
     function generatePegs(setCount) {
         const pegs = []
         const rowSpacing = 160
@@ -117,30 +117,30 @@ export function initCanvas(canvas) {
             const yOffset = i * rowSpacing * 2
 
             for (let x of rowOffsets[0]) {
-                pegs.push({ x, y: firstRowY + yOffset, radius: pegRadius, amount: pegAmount, hit: false })
+                pegs.push({ x, y: firstRowY + yOffset, radius: pegRadius, hit: false, hits: gameState.pegHits })
             }
 
             for (let x of rowOffsets[1]) {
-                pegs.push({ x, y: secondRowY + yOffset, radius: pegRadius, amount: pegAmount, hit: false })
+                pegs.push({ x, y: secondRowY + yOffset, radius: pegRadius, hit: false, hits: gameState.pegHits })
             }
         }
         return pegs
     }
-    const pegs = generatePegs(3)
+    let pegs = generatePegs(gameState.pegRows)
 
     const bottomWalls = [
-        { x: 199, y: maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 279, y: maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 359, y: maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 439, y: maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 519, y: maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 599, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 679, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 759, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 839, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 919, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 999, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 1079, y: maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 199, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 279, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 359, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 439, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 519, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 599, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 679, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 759, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 839, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 919, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 999, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 1079, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
     ]
     let multipliers = [
         { text: null, textX: 159, textY: displayHeight - 24, x: 119, y: cameraY + displayHeight },
@@ -169,12 +169,12 @@ export function initCanvas(canvas) {
 
     const dropZone = {
         xMax: 1080,
-        xMin: 120
+        xMin: 120,
     }
     let ghostCoin = {
         x: 600,
         y: 0,
-        radius: 32
+        radius: 32,
     }
     function resetBoard(coin) {
         if (coin.y - coin.radius < cameraY + displayHeight) {
@@ -190,9 +190,8 @@ export function initCanvas(canvas) {
                     multi["text"] = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
                 })
                 pegs.forEach(peg => {
-                    if (peg.hit == true) {
                         peg.hit = false
-                    }
+                        peg.hits = gameState.pegHits
                 })
             }
 
@@ -252,7 +251,7 @@ export function initCanvas(canvas) {
 
             // handle bottom wall collisions
             bottomWalls.forEach(wall => {
-                const wallY = maxWorldHeight - wall.height
+                const wallY = gameState.maxWorldHeight - wall.height
 
                 if (
                     coin.x + coin.radius > wall.x &&
@@ -297,10 +296,15 @@ export function initCanvas(canvas) {
                     if (velocityMag < 0.5) {
                         coin.vx += (Math.random() < 0.5 ? -1 : 1) * 3
                     }
-                    if (peg.hit == false) {
-                        peg.hit = true
+                    if (peg.hits != 0 && peg.hit != true) {
+                        peg.hits -= 1
                         score += 1
+                        console.log(score)
                     }
+                    if (peg.hits == 0) {
+                        peg.hit = true
+                    }
+
                 }
             })
         })
@@ -309,7 +313,7 @@ export function initCanvas(canvas) {
             const targetY = lastCoin.y - displayHeight / 2
 
             cameraY += (targetY - cameraY) * 0.05
-            cameraY = Math.max(0, Math.min(cameraY, maxWorldHeight - displayHeight))
+            cameraY = Math.max(0, Math.min(cameraY, gameState.maxWorldHeight - displayHeight))
         } else {
             cameraY += (0 - cameraY) * 0.05
         }
@@ -395,14 +399,14 @@ export function initCanvas(canvas) {
                 score = 0
                 let offset = 0
                 for (let i = 1; i <= gameState.coins; i++) {
-                    
-                    if (i%2==1 && i!=1){
-                        offset=-offset
-                    } else if(i%2==0 && i!=1){
-                        offset=Math.abs(offset)+64
+
+                    if (i % 2 == 1 && i != 1) {
+                        offset = -offset
+                    } else if (i % 2 == 0 && i != 1) {
+                        offset = Math.abs(offset) + 64
                     }
                     coins.push({
-                        x: ghostCoin.x+offset,
+                        x: ghostCoin.x + offset,
                         y: ghostCoin.y,
                         radius: 32,
                         vx: 0,
@@ -423,6 +427,11 @@ export function initCanvas(canvas) {
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
                     button.onClick()
+                    pegs = generatePegs(gameState.pegRows)
+                    pegs.forEach(peg => {
+                            peg.hit = false
+                            peg.hits = gameState.pegHits
+                    })
                     currentScene = "pachinko"
                     button.onClick = null
                 }
@@ -522,12 +531,12 @@ export function initCanvas(canvas) {
 
 
         ctx.fillStyle = "#A8E6CF"
-        ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, maxWorldHeight)
-        ctx.fillRect(rightWallX - 4, 0 - cameraY, 8, maxWorldHeight)
+        ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, gameState.maxWorldHeight)
+        ctx.fillRect(rightWallX - 4, 0 - cameraY, 8, gameState.maxWorldHeight)
 
         bottomWalls.forEach(wall => {
             ctx.fillStyle = "#2D2D2D"
-            ctx.fillRect(wall.x, wall.y - cameraY, wall.width, wall.height)
+            ctx.fillRect(wall.x, gameState.maxWorldHeight - cameraY-48, wall.width, wall.height)
         })
 
         multipliers.forEach(multi => {
@@ -539,7 +548,7 @@ export function initCanvas(canvas) {
         })
 
         ctx.fillStyle = "#2D2D2D"
-        ctx.fillRect(199, maxWorldHeight - cameraY - 48, 2, 48)
+        ctx.fillRect(199, gameState.maxWorldHeight - cameraY - 48, 2, 48)
 
         pegs.forEach(peg => {
             if (pegImg.isLoaded && peg.hit == false) {
