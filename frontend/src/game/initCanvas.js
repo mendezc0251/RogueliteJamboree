@@ -25,11 +25,6 @@ export function initCanvas(canvas) {
 
     let mouseX = 0
     let mouseY = 0
-    //TODO: Create sprite class to add children to menuScene GameObject
-    const menuScene = new GameObject({
-        position: { x: 0, y: 0 }
-    });
-
 
     // Track mouse clicks
     canvas.addEventListener("click", function (event) {
@@ -60,6 +55,9 @@ export function initCanvas(canvas) {
         }
         else if (currentScene === "upgradePachinko") {
             updateUpgradePachinko()
+        }
+        else if(currentScene==="gameoverPachinko"){
+            updateGameoverPachinko()
         }
         else if (currentScene === "slots") {
             updateSlots()
@@ -94,6 +92,9 @@ export function initCanvas(canvas) {
         pegHits: 1,
         maxWorldHeight: 1200,
         pegRows:3,
+        round: 1,
+        rounds: 5,
+        ammo:1,
     }
 
     const leftWallX = 119
@@ -102,7 +103,6 @@ export function initCanvas(canvas) {
     let cameraY = 0
     // instantiate coins array and ammo
     let coins = []
-    let ammo = 1
     function generatePegs(setCount) {
         const pegs = []
         const rowSpacing = 160
@@ -162,8 +162,6 @@ export function initCanvas(canvas) {
         multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
     })
 
-    let round = 1
-    let rounds = 5
     let totalScore = 0
     let score = 0
 
@@ -208,14 +206,15 @@ export function initCanvas(canvas) {
     }
 
     function handleRoundEnd() {
-        if (round == rounds) {
+        if (gameState.round == gameState.rounds) {
+            currentScene="gameoverPachinko"
             console.log("Game Over!")
         } else {
             upgradeButtonsArr = upgradesClass.getRandomUpgrades()
             console.log("ROUND OVER!")
-            round += 1
-            console.log("Round " + round + " begin!")
-            ammo += 2
+            gameState.round += 1
+            console.log("Round " + gameState.round + " begin!")
+            gameState.ammo += 2
             currentScene = "upgradePachinko"
         }
     }
@@ -231,7 +230,7 @@ export function initCanvas(canvas) {
 
 
     function updatePachinko() {
-        if (ammo == 0 && coins.length == 0) {
+        if (gameState.ammo == 0 && coins.length == 0) {
             handleRoundEnd();
         }
 
@@ -332,6 +331,42 @@ export function initCanvas(canvas) {
         })
     }
 
+    // function to reset Pachinko game
+    function resetPachinkoGameState(){
+        console.log("resetting game board")
+        gameState = {
+        bfNum: 0.5,
+        multiplier: ["x2", "x1", "x.5"],
+        coins: 1,
+        pegHits: 1,
+        maxWorldHeight: 1200,
+        pegRows:3,
+        round: 1,
+        rounds: 5,
+        ammo:1,
+    }
+        currentScene="pachinko"
+    }
+    //Set button width and location on canvas
+    let buttonWidth = displayWidth * 0.3 //20% width button
+    let buttonHeight = displayHeight * 0.15 //10% height button
+
+    let buttonX = (displayWidth - buttonWidth) / 2 // center horizontal
+    let buttonY = displayHeight * 0.6 //50% from top
+    let buttonY2 = displayHeight * 0.4
+    const gameoverButtons = [
+        { text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: resetPachinkoGameState },
+        { text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => currentScene = "menu" },
+    ]
+    // update functionf or Pachinko game over scene
+    function updateGameoverPachinko(){
+        gameoverButtons.forEach(button =>{
+            button.isHovered = mouseX>=button.x && mouseX<=button.x+button.width
+            && mouseY>=button.y && mouseY<=button.y+button.height
+        })
+
+    }
+
     function updateSlots() {
 
     }
@@ -353,6 +388,9 @@ export function initCanvas(canvas) {
         else if (currentScene === "upgradePachinko") {
             renderUpgradePachinko()
         }
+        else if (currentScene === "gameoverPachinko") {
+            renderGameoverPachinko()
+        }
         else if (currentScene === "slots") {
             renderSlots()
         }
@@ -364,11 +402,11 @@ export function initCanvas(canvas) {
     const headerBack = resources.images.headerBack;
 
     //Set button width and location on canvas
-    const buttonWidth = displayWidth * 0.3 //20% width button
-    const buttonHeight = displayHeight * 0.15 //10% height button
+    buttonWidth = displayWidth * 0.3 //20% width button
+    buttonHeight = displayHeight * 0.15 //10% height button
 
-    const buttonX = (displayWidth - buttonWidth) / 2 // center horizontal
-    const buttonY = displayHeight * 0.6 //50% from top
+    buttonX = (displayWidth - buttonWidth) / 2 // center horizontal
+    buttonY = displayHeight * 0.6 //50% from top
 
     const buttons = [
         { text: "Play", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => currentScene = "characterSelect" }
@@ -395,7 +433,7 @@ export function initCanvas(canvas) {
         }
         else if (currentScene === "pachinko") {
 
-            if (coins.length <= 0 && ammo != 0) {
+            if (coins.length <= 0 && gameState.ammo != 0) {
                 score = 0
                 let offset = 0
                 for (let i = 1; i <= gameState.coins; i++) {
@@ -418,7 +456,7 @@ export function initCanvas(canvas) {
                     })
                 }
 
-                ammo -= 1
+                gameState.ammo -= 1
             }
         }
         else if (currentScene === "upgradePachinko") {
@@ -434,6 +472,15 @@ export function initCanvas(canvas) {
                     })
                     currentScene = "pachinko"
                     button.onClick = null
+                }
+            })
+        }
+        else if(currentScene ==="gameoverPachinko"){
+            gameoverButtons.forEach(button =>{
+                const withinX = mouseX>=button.x && mouseX<=button.x+button.width
+                const withinY = mouseY>=button.y && mouseY<=button.y+button.height
+                if(withinX && withinY){
+                    button.onClick()
                 }
             })
         }
@@ -591,6 +638,29 @@ export function initCanvas(canvas) {
             ctx.textBaseline = "middle"
             ctx.fillStyle = "#F9F7F1"
             ctx.fillText(button.text, button.x + 150, button.y - 50)
+        })
+    }
+    // renders gameover screen
+    function renderGameoverPachinko(){
+        ctx.clearRect(0,0,displayWidth,displayHeight)
+
+        ctx.fillStyle = "#2D2D2D"
+        ctx.fillRect(0,0,displayWidth,displayHeight)
+
+        ctx.font = '60px "Press Start 2P"'
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillStyle = "#F9F7F1"
+        ctx.fillText("GAME OVER",displayWidth/2,displayHeight*0.3)
+
+        gameoverButtons.forEach(button =>{
+            ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
+            ctx.fillRect(button.x,button.y,button.width,button.height)
+            ctx.font = '30px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(button.text, button.x+(button.width/2),button.y+(button.height/2))
         })
     }
     function renderSlots() {
