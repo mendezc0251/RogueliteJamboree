@@ -93,8 +93,10 @@ export function initCanvas(canvas) {
         maxWorldHeight: 1200,
         pegRows:3,
         round: 1,
-        rounds: 5,
+        rounds: 1,
         ammo:1,
+        totalScore: 0,
+        score: 0,
     }
 
     const leftWallX = 119
@@ -162,9 +164,6 @@ export function initCanvas(canvas) {
         multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
     })
 
-    let totalScore = 0
-    let score = 0
-
     const dropZone = {
         xMax: 1080,
         xMin: 120,
@@ -179,11 +178,11 @@ export function initCanvas(canvas) {
             return true
         }
         else {
-            console.log(score + " Before multiplier")
+            console.log(gameState.score + " Before multiplier")
             multiScore(coin)
-            console.log(score + " After multiplier")
+            console.log(gameState.score + " After multiplier")
             if (coins.length == 1) {
-                totalScore += score
+                gameState.totalScore += gameState.score
                 multipliers.forEach(multi => {
                     multi["text"] = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
                 })
@@ -200,7 +199,7 @@ export function initCanvas(canvas) {
         multipliers.forEach(multi => {
             if (c.x > multi.x && c.x < multi.x + 80) {
                 console.log(parseFloat(("" + multi.text).slice(1)))
-                score = Math.floor(score * parseFloat(("" + multi.text).slice(1)))
+                gameState.score = Math.floor(gameState.score * parseFloat(("" + multi.text).slice(1)))
             }
         })
     }
@@ -297,8 +296,8 @@ export function initCanvas(canvas) {
                     }
                     if (peg.hits != 0 && peg.hit != true) {
                         peg.hits -= 1
-                        score += 1
-                        console.log(score)
+                        gameState.score += 1
+                        console.log(gameState.score)
                     }
                     if (peg.hits == 0) {
                         peg.hit = true
@@ -344,8 +343,16 @@ export function initCanvas(canvas) {
         round: 1,
         rounds: 5,
         ammo:1,
+        totalScore:0,
+        score:0,
     }
-        currentScene="pachinko"
+    upgradesClass=new Upgrades(displayWidth,displayHeight,gameState)
+    upgradeButtonsArr = upgradesClass.getRandomUpgrades()
+
+    multipliers.forEach(multi => {
+        multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
+    })
+        
     }
     //Set button width and location on canvas
     let buttonWidth = displayWidth * 0.3 //20% width button
@@ -355,8 +362,14 @@ export function initCanvas(canvas) {
     let buttonY = displayHeight * 0.6 //50% from top
     let buttonY2 = displayHeight * 0.4
     const gameoverButtons = [
-        { text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: resetPachinkoGameState },
-        { text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => currentScene = "menu" },
+        { text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick:()=>{ 
+            resetPachinkoGameState()
+            currentScene="pachinko"
+        } },
+        { text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () =>{
+            resetPachinkoGameState()
+            currentScene="menu"
+        }},
     ]
     // update functionf or Pachinko game over scene
     function updateGameoverPachinko(){
@@ -434,7 +447,7 @@ export function initCanvas(canvas) {
         else if (currentScene === "pachinko") {
 
             if (coins.length <= 0 && gameState.ammo != 0) {
-                score = 0
+                gameState.score = 0
                 let offset = 0
                 for (let i = 1; i <= gameState.coins; i++) {
 
@@ -620,7 +633,7 @@ export function initCanvas(canvas) {
         ctx.textAlign = "center"
         ctx.textBaseline = "left"
         ctx.fillStyle = "#F9F7F1"
-        ctx.fillText(totalScore, 100, 25)
+        ctx.fillText(gameState.totalScore, 100, 25)
         ctx.globalAlpha = 1.0
     }
     // renders the upgrade screen after each round
