@@ -4,9 +4,16 @@ import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
 import Game from './Game'
 import Shop from './Shop'
 import About from './About'
+import { useEffect, useState } from 'react'
 
 function App() {
-  
+  const [message, setMessage] = useState('Loading...');
+
+  useEffect(()=>{
+    fetch('/api/hello')
+    .then(res => res.json())
+    .then(data=>setMessage(data.message));
+  }, []);
 
   return (
     <BrowserRouter>
