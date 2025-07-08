@@ -4,6 +4,7 @@ import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
 import Game from './Game'
 import Shop from './Shop'
 import About from './About'
+import Login from './Login'
 import { useEffect, useState } from 'react'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path='/' element={<Game />}/>
         <Route path='/shop' element={<Shop />}/>
         <Route path='/about' element={<About/>}/>
+        <Route path='/login' element={<Login/>}/>
       </Routes>
       
     </BrowserRouter>
