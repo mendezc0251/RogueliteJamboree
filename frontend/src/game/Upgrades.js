@@ -2,7 +2,7 @@ export class Upgrades {
 
     constructor(displayWidth,displayHeight,gameState) {
         this.gameState=gameState;
-        // function tied to the +1 ball upgrade
+        
         const addCoin = () => {
             this.gameState.coins += 1
             console.log("Ball added!")
@@ -31,6 +31,11 @@ export class Upgrades {
             this.gameState.pegHits += 1
             console.log("Peg's reinforced!")
         }
+        const moreAmmo = () =>{
+            this.gameState.maxAmmo += 1
+            this.gameState.ammo=this.gameState.maxAmmo
+            console.log("+1 Ammo")
+        }
         // array that holds all available upgrades
         this.upgrades = [
             { text: "+1 Ball", description: "Adds a extra coin to the drop", onClick: addCoin },
@@ -38,6 +43,7 @@ export class Upgrades {
             { text: "High risk! High reward!", description: "Adds higher chance to get .5x and 2x multipliers", onClick: highRiskReward },
             { text: "+2 rows", description: "Adds another row to the Pachinko board", onClick: addRows },
             { text: "Reinforced pegs", description: "Allows a ball to score twice on the same peg", onClick: morePegHits },
+            { text: "+1 Ammo", description: "Adds a extra coin to your ammo", onClick: moreAmmo }
         ]
         // array to hold upgrades offered to the player
         this.upgradeButtons = [

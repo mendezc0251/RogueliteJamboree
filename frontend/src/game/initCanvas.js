@@ -93,8 +93,9 @@ export function initCanvas(canvas) {
         maxWorldHeight: 1200,
         pegRows:3,
         round: 1,
-        rounds: 1,
-        ammo:1,
+        rounds: 5,
+        ammo:2,
+        maxAmmo:2,
         totalScore: 0,
         score: 0,
     }
@@ -213,7 +214,8 @@ export function initCanvas(canvas) {
             console.log("ROUND OVER!")
             gameState.round += 1
             console.log("Round " + gameState.round + " begin!")
-            gameState.ammo += 2
+            console.log(gameState.maxAmmo)
+            gameState.ammo = gameState.maxAmmo
             currentScene = "upgradePachinko"
         }
     }
@@ -342,10 +344,14 @@ export function initCanvas(canvas) {
         pegRows:3,
         round: 1,
         rounds: 5,
-        ammo:1,
+        ammo:2,
+        maxAmmo:2,
         totalScore:0,
         score:0,
     }
+
+    pegs = generatePegs(gameState.pegRows)
+
     upgradesClass=new Upgrades(displayWidth,displayHeight,gameState)
     upgradeButtonsArr = upgradesClass.getRandomUpgrades()
 
