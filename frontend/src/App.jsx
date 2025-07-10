@@ -1,10 +1,10 @@
 import './App.css'
 import jamboreePng from '/assets/jamboree.png'
 import { BrowserRouter,Route,Routes,Link } from 'react-router-dom'
-import Game from './Game'
-import Shop from './Shop'
-import About from './About'
-import Login from './Login'
+import Game from './components/Game'
+import Shop from './components/Shop'
+import About from './components/About'
+import Login from './components/Login'
 import { useEffect, useState } from 'react'
 
 function App() {
