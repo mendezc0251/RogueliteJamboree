@@ -207,6 +207,9 @@ export function initCanvas(canvas) {
 
     function handleRoundEnd() {
         if (gameState.round == gameState.rounds) {
+            const guestData = JSON.parse(localStorage.getItem('rj_guest_data'))
+            guestData.pachinkoPoints = (guestData.pachinkoPoints) + gameState.totalScore
+            localStorage.setItem("rj_guest_data", JSON.stringify(guestData))
             currentScene="gameoverPachinko"
             console.log("Game Over!")
         } else {
