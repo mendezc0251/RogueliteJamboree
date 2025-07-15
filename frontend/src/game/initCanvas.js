@@ -56,7 +56,7 @@ export function initCanvas(canvas) {
         else if (currentScene === "upgradePachinko") {
             updateUpgradePachinko()
         }
-        else if(currentScene==="gameoverPachinko"){
+        else if (currentScene === "gameoverPachinko") {
             updateGameoverPachinko()
         }
         else if (currentScene === "slots") {
@@ -82,22 +82,24 @@ export function initCanvas(canvas) {
             button.isHovered = mouseX >= button.x && mouseX <= button.x + button.width
                 && mouseY >= button.y && mouseY <= button.y + button.height
         })
-
     }
-
+    let guestData = JSON.parse(localStorage.getItem("rj_guest_data"))
     let gameState = {
-        bfNum: 0.5,
-        multiplier: ["x2", "x1", "x.5"],
-        coins: 1,
-        pegHits: 1,
-        maxWorldHeight: 1200,
-        pegRows:3,
-        round: 1,
-        rounds: 5,
-        ammo:2,
-        maxAmmo:2,
-        totalScore: 0,
-        score: 0,
+                    bfNum: 0.5,
+                    multiplier: ["x2", "x1", "x1", "x1", "x.5"],
+                    coins: 1,
+                    pegHits: 1,
+                    maxWorldHeight: 1200,
+                    pegRows: 3,
+                    round: 1,
+                    rounds: 5,
+                    ammo: 2,
+                    maxAmmo: 2,
+                    totalScore: 0,
+                    score: 0,
+                }
+    if(guestData){
+        gameState = guestData.pachinkoGameState
     }
 
     const leftWallX = 119
@@ -188,8 +190,8 @@ export function initCanvas(canvas) {
                     multi["text"] = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
                 })
                 pegs.forEach(peg => {
-                        peg.hit = false
-                        peg.hits = gameState.pegHits
+                    peg.hit = false
+                    peg.hits = gameState.pegHits
                 })
             }
 
@@ -209,8 +211,13 @@ export function initCanvas(canvas) {
         if (gameState.round == gameState.rounds) {
             const guestData = JSON.parse(localStorage.getItem('rj_guest_data'))
             guestData.pachinkoPoints = (guestData.pachinkoPoints) + gameState.totalScore
+            if (gameState.totalScore > guestData.pachinkoHighscore) {
+                guestData.pachinkoHighscore = gameState.totalScore
+            }
             localStorage.setItem("rj_guest_data", JSON.stringify(guestData))
-            currentScene="gameoverPachinko"
+
+
+            currentScene = "gameoverPachinko"
             console.log("Game Over!")
         } else {
             upgradeButtonsArr = upgradesClass.getRandomUpgrades()
@@ -336,32 +343,20 @@ export function initCanvas(canvas) {
     }
 
     // function to reset Pachinko game
-    function resetPachinkoGameState(){
+    function resetPachinkoGameState() {
+        guestData = JSON.parse(localStorage.getItem("rj_guest_data"))
         console.log("resetting game board")
-        gameState = {
-        bfNum: 0.5,
-        multiplier: ["x2", "x1", "x.5"],
-        coins: 1,
-        pegHits: 1,
-        maxWorldHeight: 1200,
-        pegRows:3,
-        round: 1,
-        rounds: 5,
-        ammo:2,
-        maxAmmo:2,
-        totalScore:0,
-        score:0,
-    }
+        gameState = guestData.pachinkoGameState
 
-    pegs = generatePegs(gameState.pegRows)
+        pegs = generatePegs(gameState.pegRows)
 
-    upgradesClass=new Upgrades(displayWidth,displayHeight,gameState)
-    upgradeButtonsArr = upgradesClass.getRandomUpgrades()
+        upgradesClass = new Upgrades(displayWidth, displayHeight, gameState)
+        upgradeButtonsArr = upgradesClass.getRandomUpgrades()
 
-    multipliers.forEach(multi => {
-        multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
-    })
-        
+        multipliers.forEach(multi => {
+            multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
+        })
+
     }
     //Set button width and location on canvas
     let buttonWidth = displayWidth * 0.3 //20% width button
@@ -371,20 +366,24 @@ export function initCanvas(canvas) {
     let buttonY = displayHeight * 0.6 //50% from top
     let buttonY2 = displayHeight * 0.4
     const gameoverButtons = [
-        { text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick:()=>{ 
-            resetPachinkoGameState()
-            currentScene="pachinko"
-        } },
-        { text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () =>{
-            resetPachinkoGameState()
-            currentScene="menu"
-        }},
+        {
+            text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
+                resetPachinkoGameState()
+                currentScene = "pachinko"
+            }
+        },
+        {
+            text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
+                resetPachinkoGameState()
+                currentScene = "menu"
+            }
+        },
     ]
     // update functionf or Pachinko game over scene
-    function updateGameoverPachinko(){
-        gameoverButtons.forEach(button =>{
-            button.isHovered = mouseX>=button.x && mouseX<=button.x+button.width
-            && mouseY>=button.y && mouseY<=button.y+button.height
+    function updateGameoverPachinko() {
+        gameoverButtons.forEach(button => {
+            button.isHovered = mouseX >= button.x && mouseX <= button.x + button.width
+                && mouseY >= button.y && mouseY <= button.y + button.height
         })
 
     }
@@ -489,19 +488,19 @@ export function initCanvas(canvas) {
                     button.onClick()
                     pegs = generatePegs(gameState.pegRows)
                     pegs.forEach(peg => {
-                            peg.hit = false
-                            peg.hits = gameState.pegHits
+                        peg.hit = false
+                        peg.hits = gameState.pegHits
                     })
                     currentScene = "pachinko"
                     button.onClick = null
                 }
             })
         }
-        else if(currentScene ==="gameoverPachinko"){
-            gameoverButtons.forEach(button =>{
-                const withinX = mouseX>=button.x && mouseX<=button.x+button.width
-                const withinY = mouseY>=button.y && mouseY<=button.y+button.height
-                if(withinX && withinY){
+        else if (currentScene === "gameoverPachinko") {
+            gameoverButtons.forEach(button => {
+                const withinX = mouseX >= button.x && mouseX <= button.x + button.width
+                const withinY = mouseY >= button.y && mouseY <= button.y + button.height
+                if (withinX && withinY) {
                     button.onClick()
                 }
             })
@@ -605,7 +604,7 @@ export function initCanvas(canvas) {
 
         bottomWalls.forEach(wall => {
             ctx.fillStyle = "#2D2D2D"
-            ctx.fillRect(wall.x, gameState.maxWorldHeight - cameraY-48, wall.width, wall.height)
+            ctx.fillRect(wall.x, gameState.maxWorldHeight - cameraY - 48, wall.width, wall.height)
         })
 
         multipliers.forEach(multi => {
@@ -663,26 +662,26 @@ export function initCanvas(canvas) {
         })
     }
     // renders gameover screen
-    function renderGameoverPachinko(){
-        ctx.clearRect(0,0,displayWidth,displayHeight)
+    function renderGameoverPachinko() {
+        ctx.clearRect(0, 0, displayWidth, displayHeight)
 
         ctx.fillStyle = "#2D2D2D"
-        ctx.fillRect(0,0,displayWidth,displayHeight)
+        ctx.fillRect(0, 0, displayWidth, displayHeight)
 
         ctx.font = '60px "Press Start 2P"'
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.fillStyle = "#F9F7F1"
-        ctx.fillText("GAME OVER",displayWidth/2,displayHeight*0.3)
+        ctx.fillText("GAME OVER", displayWidth / 2, displayHeight * 0.3)
 
-        gameoverButtons.forEach(button =>{
+        gameoverButtons.forEach(button => {
             ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
-            ctx.fillRect(button.x,button.y,button.width,button.height)
+            ctx.fillRect(button.x, button.y, button.width, button.height)
             ctx.font = '30px "Press Start 2P"'
             ctx.textAlign = "center"
             ctx.textBaseline = "middle"
             ctx.fillStyle = "#F9F7F1"
-            ctx.fillText(button.text, button.x+(button.width/2),button.y+(button.height/2))
+            ctx.fillText(button.text, button.x + (button.width / 2), button.y + (button.height / 2))
         })
     }
     function renderSlots() {

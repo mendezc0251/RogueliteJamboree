@@ -12,6 +12,7 @@ const Shop = () => {
     const handlePurchase = (item) =>{
         if (guestData.pachinkoPoints>=item.cost && !guestData.ownedUpgrades.includes(item.id)){
             const updatedGuestData={
+                pachinkoHighscore: guestData.pachinkoHighscore,
                 pachinkoGameState: guestData.pachinkoGameState,
                 pachinkoPoints: guestData.pachinkoPoints-item.cost,
                 ownedUpgrades: [...guestData.ownedUpgrades, item.id]

@@ -1,4 +1,10 @@
 .shop-grid{
+    display:flex;
     flex:1;
-    flex-flow:wrap;
+    flex-flow:row wrap;
+    gap:20px;
+}
+
+.shopCard{
+    text-align:center;
 }
