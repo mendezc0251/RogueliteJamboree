@@ -25,6 +25,7 @@ function App() {
             <li><Link to={"/"}>home</Link></li>
             <li><Link to={"/Shop"}>shop</Link></li>
             <li><Link to={"/About"}>about</Link></li>
+            <li><Link to ={"/Login"}>login</Link></li>
           </ul>
         </div>
       </header>
