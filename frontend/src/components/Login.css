@@ -30,7 +30,7 @@ button{
     padding: 15px 20px;
 }
 
-.user, .pass{
+.user, .pass, .email{
     border-radius:10px;
 }
 
@@ -41,6 +41,10 @@ button{
 
 a{
     color:#2D2D2D;
+}
+
+a:hover{
+    cursor:pointer;
 }
 
 p{
