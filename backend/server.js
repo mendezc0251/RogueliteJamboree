@@ -24,6 +24,10 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message:'Invalid username' })
     }
 
+    console.log(user)
+    console.log(password)
+    console.log(user.passwordHash)
+
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if(!isValid){
         return res.status(401).json( {message:'Invalid password'} )
@@ -34,6 +38,7 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/register', async(req, res) => {
+    console.log('req.body', req.body)
     const{email, username, password} = req.body;
 
     const existingUser = users.find(e => e.email===email);
@@ -41,7 +46,18 @@ app.post('/register', async(req, res) => {
         return res.status(409).json({message: 'Username already taken' })
     }
 
-    const passwordHash = bcrypt.hash(password, 10)
+    const passwordHash = await bcrypt.hash(password, 10)
+
+    const newUser = {
+        id:users.length+1,
+        email:email,
+        username:username,
+        passwordHash:passwordHash
+    }
+
+    users.push(newUser)
+
+    res.status(201).json({message: 'User registered successfully'})
 })
 
 app.get('/api/hello', (req, res)=>{
