@@ -38,6 +38,29 @@ function Login() {
         }
     }
 
+    const handleRegister = async (e) => {
+        e.preventDefault()
+        console.log(email)
+
+        try {
+            const res = await fetch('http://localhost:3001/register', {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            })
+
+            const data = await res.json();
+            if(res.ok){
+                setMessage('Registration successful')
+            } else {
+                setMessage(data.message || 'Registration failed.')
+            }
+        } catch(error){
+            console.error('Registration error:', error)
+            setMessage('Something went wrong.')
+        }
+    }
+
     return (
         <>
             <div className="login-container">
@@ -59,7 +82,7 @@ function Login() {
                             <p>Don't have an account? <a onClick={toggleAuthMode}>Register</a></p>
                         </form>
                     ) : (
-                        <form onSubmit={handleLogin} action="">
+                        <form onSubmit={handleRegister} action="">
                             <h1>Register</h1>
                             <input className="email" type="text" name="email" placeholder="email@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required></input>
                             <input className="user" type="text" name="username" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} required></input>
@@ -72,7 +95,7 @@ function Login() {
                                 <a>Forgot Password?</a>
                             </div>
                             {message && <p>{message}</p>}
-                            <button type="submit">Log In</button>
+                            <button type="submit">Register</button>
                             <p>Already have an account? <a onClick={toggleAuthMode}>Login</a></p>
                         </form>
                     )}
