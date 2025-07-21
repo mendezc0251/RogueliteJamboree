@@ -6,6 +6,7 @@
 
 .login-form{
     margin:auto;
+    max-width:660px;
 }
 
 form{
@@ -49,4 +50,12 @@ a:hover{
 
 p{
     margin:0;
+}
+
+.feedback{
+    color:red;
+}
+
+.good-feedback{
+    color:green;
 }
