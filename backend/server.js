@@ -2,49 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-require('dotenv').config();
-
-const url = process.env.MONGODB_URI
-
-const connectDB = async () => {
-    try {
-        await mongoose.connect(url, {
-
-        });
-    } catch (err) {
-        console.error('Error connecting to the database: ', err);
-        process.exit(1);
-    }
-};
-
-module.exports = connectDB
-
-const userSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true },
-    passwordHash: { type: String, required: true },
-    rj_data: {
-        pachinkoHighscore: { type: Number, required: true },
-        pachinkoGameState: {
-            bfNum: { type: Number, required: true },
-            multiplier: [{ type: String, required: true }],
-            coins: { type: Number, required: true },
-            pegHits: { type: Number, required: true },
-            maxWorldHeight: { type: Number, required: true },
-            pegRows: { type: Number, required: true },
-            round: {type: Number, required: true },
-            rounds: {type: Number, required: true },
-            ammo: {type: Number, required: true },
-            maxAmmo: {type: Number, required: true },
-            totalScore: {type: Number, required: true },
-            score: {type: Number, required: true },
-        },
-        pachinkoPoints: { type: Number, required: true },
-        ownedUpgrades: [{ type: String }],
-    }
-
-})
 
 const app = express();
 const PORT = 3001;
@@ -80,26 +37,32 @@ app.post('/login', async (req, res) => {
     res.json({ token });
 })
 
+const connectDB = require('./db')
+const User = require('./user')
+
 app.post('/register', async (req, res) => {
     console.log('req.body', req.body)
-    const { email, username, password } = req.body;
+    const { email, username, password, rj_data } = req.body;
 
-    const existingUser = users.find(e => e.email === email);
+    await connectDB()
+
+    const existingUser = await User.findOne({ username: username });
+    console.log(existingUser)
     if (existingUser) {
         return res.status(409).json({ message: 'Username already taken' })
     }
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    const newUser = {
-        id: users.length + 1,
-        email: email,
+    const newUser = new User({
+
         username: username,
-        passwordHash: passwordHash
-    }
+        email: email,
+        passwordHash: passwordHash,
+        rj_data: rj_data
+    })
 
-    users.push(newUser)
-
+    await newUser.save()
     res.status(201).json({ message: 'User registered successfully' })
 })
 

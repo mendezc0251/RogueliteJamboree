@@ -10,6 +10,31 @@ function Login() {
     const [authMode, setAuthMode] = useState('login')
     const [feedback, setFeedback] = useState('')
     const [strongPassword, setStrongPassword] = useState(false)
+    const [rj_data, setRj_Data] = useState(() => {
+        if (localStorage.getItem("rj_guest_data")) {
+            return JSON.parse(localStorage.getItem("rj_guest_data"))
+        } else {
+            return {
+                pachinkoHighscore: 0,
+                pachinkoPoints: 0,
+                pachinkoGameState: {
+                    bfNum: 0.5,
+                    multiplier: ["x2", "x1", "x1", "x1", "x.5"],
+                    coins: 1,
+                    pegHits: 1,
+                    maxWorldHeight: 1200,
+                    pegRows: 3,
+                    round: 1,
+                    rounds: 5,
+                    ammo: 2,
+                    maxAmmo: 2,
+                    totalScore: 0,
+                    score: 0,
+                },
+                ownedUpgrades: [],
+            }
+        }
+    })
 
     const toggleAuthMode = () => {
         setAuthMode(authMode === 'login' ? 'register' : 'login')
@@ -48,22 +73,22 @@ function Login() {
             const res = await fetch('http://localhost:3001/register', {
                 method: 'POST',
                 headers: { 'Content-type': 'application/json' },
-                body: JSON.stringify({ email, username, password })
+                body: JSON.stringify({ email, username, password, rj_data })
             })
 
             const data = await res.json();
-            if(res.ok){
+            if (res.ok) {
                 setMessage('Registration successful')
             } else {
                 setMessage(data.message || 'Registration failed.')
             }
-        } catch(error){
+        } catch (error) {
             console.error('Registration error:', error)
             setMessage('Something went wrong.')
         }
     }
 
-    const handleChange= (e) =>{
+    const handleChange = (e) => {
         const newPwd = e.target.value
         setPassword(newPwd)
         validatePassword(newPwd)
@@ -71,13 +96,13 @@ function Login() {
 
     const validatePassword = (pwd) => {
         const errors = []
-        if(pwd.length<8) errors.push("at least 8 characters")
-        if(!/[a-z]/.test(pwd)) errors.push("a lowercase letter")
-        if(!/[A-Z]/.test(pwd)) errors.push("a uppercase letter")
-        if(!/[1-9]/.test(pwd)) errors.push("a number")
-        if(!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) errors.push("a symbol")
+        if (pwd.length < 8) errors.push("at least 8 characters")
+        if (!/[a-z]/.test(pwd)) errors.push("a lowercase letter")
+        if (!/[A-Z]/.test(pwd)) errors.push("a uppercase letter")
+        if (!/[1-9]/.test(pwd)) errors.push("a number")
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) errors.push("a symbol")
 
-        if(errors.length===0){
+        if (errors.length === 0) {
             setFeedback("Strong password!")
             setStrongPassword(false)
         } else {
@@ -109,10 +134,10 @@ function Login() {
                     ) : (
                         <form onSubmit={handleRegister} action="">
                             <h1>Register</h1>
-                            <input className="email" type="text" name="email" placeholder="email@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required></input>
+                            <input className="email" type="email" name="email" placeholder="email@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required></input>
                             <input className="user" type="text" name="username" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} required></input>
                             <input className="pass" type="password" name="password" placeholder="password" value={password} onChange={handleChange} required></input>
-                            <p className={strongPassword?"feedback":"good-feedback"}>{feedback}</p>
+                            <p className={strongPassword ? "feedback" : "good-feedback"}>{feedback}</p>
                             <div className="remember-forgot">
                                 <label>
                                     <input type="checkbox" name="remember" />
