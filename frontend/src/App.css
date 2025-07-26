@@ -7,8 +7,9 @@
   gap:20px;
 }
 
-h1{
+.score-points{
   margin:0;
+  font-size:clamp(1rem, 8vw, 3rem);
 }
 
 .game{

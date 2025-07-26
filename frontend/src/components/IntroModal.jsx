@@ -5,7 +5,7 @@ const IntroModal = ({ onPlayGuest, onLogin }) => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        if (!localStorage.getItem("modalSelected") || localStorage.getItem("modalSelected")==="false") {
+        if (!localStorage.getItem("modalSelected") || localStorage.getItem("modalSelected") === "false") {
             setShowModal(true);
             localStorage.setItem("modalSelected", "false")
         }
@@ -24,17 +24,21 @@ const IntroModal = ({ onPlayGuest, onLogin }) => {
         onLogin();
     }
 
-    if (!showModal || localStorage.getItem("modalSelected")==="true") return null;
+    if (!showModal || localStorage.getItem("modalSelected") === "true") return null;
 
 
-    return (<div id="introModal" class="modal">
-        <div className="modal-content">
-            <h2>Welcome to Roguelite Jamboree!</h2>
-            <p>Play as a guest or log in to save your progress and compete on the leaderboard.</p>
-            <button onClick={handleGuest}>Play as a Guest</button>
-            <button onClick={handleLogin}>Log In/Sign Up</button>
+    return (
+        <div id="introModal" class="modal">
+            <div className="modal-content">
+                <h2>Welcome to Roguelite Jamboree!</h2>
+                <p>Play as a guest or log in to save your progress and compete on the leaderboard.</p>
+                <div className="button-container">
+                    <button onClick={handleGuest}>Play as a Guest</button>
+                    <button onClick={handleLogin}>Log In/Sign Up</button>
+                </div>
+            </div>
         </div>
-    </div>)
+    )
 
 
 

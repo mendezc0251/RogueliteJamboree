@@ -1,6 +1,6 @@
 import './Login.css'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
     const [username, setUsername] = useState('')
@@ -35,6 +35,7 @@ function Login() {
             }
         }
     })
+    const navigate = useNavigate()
 
     const toggleAuthMode = () => {
         setAuthMode(authMode === 'login' ? 'register' : 'login')
@@ -55,6 +56,7 @@ function Login() {
             const data = await response.json()
             if (response.ok) {
                 setMessage('Login successful!')
+                navigate('/')
             } else {
                 setMessage(data.message || 'Login failed.')
             }
@@ -78,7 +80,7 @@ function Login() {
 
             const data = await res.json();
             if (res.ok) {
-                setMessage('Registration successful')
+                handleLogin()
             } else {
                 setMessage(data.message || 'Registration failed.')
             }

@@ -84,7 +84,7 @@ function Game() {
 
     return (
         <div className="container">
-            <h1>High Score: {guestData.pachinkoHighscore} Points: {guestData.pachinkoPoints}</h1>
+            <h1 className="score-points">High Score: {guestData.pachinkoHighscore} Points: {guestData.pachinkoPoints}</h1>
             <div className='game-container'>
                 <canvas className="game" ref={canvasRef} width="1280" height="720"></canvas>
             </div>

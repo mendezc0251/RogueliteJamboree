@@ -10,8 +10,29 @@
 }
 
 .modal-content{
+  display:flex;
+  flex-flow:column;
   background:white;
   padding:2rem;
   border-radius:8px;
   text-align:center;
+  padding:2rem 1rem;
+  gap:1.5rem;
+}
+
+h2{
+  font-size:2rem;
+  margin:0;
+  padding:0;
+}
+
+.button-container{
+  display:flex;
+  justify-content:center;
+  gap:1.5rem;
+}
+
+p{
+  max-width:70ch;
+  font-size: 1.5rem;
 }
