@@ -2,11 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+require('dotenv').config({ path: './cookie.env' });
 
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+}));
 app.use(express.json());
 
 const connectDB = require('./db')
@@ -17,7 +23,7 @@ app.post('/login', async (req, res) => {
 
     await connectDB()
 
-    const user = await User.findOne({ username:username })
+    const user = await User.findOne({ username: username })
     if (!user) {
         return res.status(401).json({ message: 'Invalid username' })
     }
@@ -30,8 +36,16 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid password' })
     }
 
-    const token = jwt.sign({ id: user.id }, 'secret-key', { expiresIn: '1h' })
-    res.json({ token });
+    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' })
+
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge: 3600000
+    })
+    // TODO: configure receiving of rj_data on frontend
+    res.json({ message: 'Logged in successfully', username:user.username, rj_guest_data:user.rj_data });
 })
 
 
@@ -61,6 +75,24 @@ app.post('/register', async (req, res) => {
     await newUser.save()
     res.status(201).json({ message: 'User registered successfully' })
 })
+
+app.get('/me', async (req, res) => {
+    const token = req.cookies.token
+    console.log(token)
+
+    if (!token) return res.status(401).json({ message: 'No token' });
+
+    try {
+        await connectDB()
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        console.log(decoded)
+        const user = await User.findOne({username:decoded.username}).select('username')
+        res.json({ username: user.username })
+    } catch (err) {
+        console.log(err)
+        res.status(401).json({ message: 'Invalid token' })
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)

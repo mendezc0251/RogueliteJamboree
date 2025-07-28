@@ -2,7 +2,7 @@ import './Login.css'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function Login() {
+function Login({setUser}) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
@@ -47,6 +47,7 @@ function Login() {
         try {
             const response = await fetch('http://localhost:3001/login', {
                 method: 'POST',
+                credentials:'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -56,6 +57,8 @@ function Login() {
             const data = await response.json()
             if (response.ok) {
                 setMessage('Login successful!')
+                console.log(data.username)
+                setUser(data.username);
                 navigate('/')
             } else {
                 setMessage(data.message || 'Login failed.')

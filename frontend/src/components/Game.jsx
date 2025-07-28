@@ -21,6 +21,8 @@ function Game() {
     })
 
     useEffect(() => {
+        
+
         if (location.pathname === '/' && canvasRef.current) {
             initCanvas(canvasRef.current)
         }
