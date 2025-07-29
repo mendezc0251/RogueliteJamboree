@@ -15,7 +15,7 @@ Come one come all to the roguelite jamboree and experience wacky hijinxs in the 
 ## Tech Stack
 
 - **Frontend:** React + Vite
-- **Backend:** Coming Soon...
+- **Backend:** Node + Express
 
 ## Getting Started
 
