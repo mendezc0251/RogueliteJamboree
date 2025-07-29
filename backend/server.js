@@ -36,13 +36,21 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid password' })
     }
 
-    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' })
+    const accessToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' })
+    const refreshToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, {expiresIn: '7d'})
 
-    res.cookie('token', token, {
+    res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'Lax',
         maxAge: 3600000
+    })
+
+    res.cookie('refreshToken', refreshToken,{
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge:604800000
     })
     // TODO: configure receiving of rj_data on frontend
     res.json({ message: 'Logged in successfully', username:user.username, rj_guest_data:user.rj_data });
@@ -77,10 +85,8 @@ app.post('/register', async (req, res) => {
 })
 
 app.get('/me', async (req, res) => {
-    const token = req.cookies.token
-    console.log(token)
-
-    if (!token) return res.status(401).json({ message: 'No token' });
+    const token = req.cookies.accessToken
+    if(!token) return res.sendStatus(401)
 
     try {
         await connectDB()
@@ -93,6 +99,26 @@ app.get('/me', async (req, res) => {
         res.status(401).json({ message: 'Invalid token' })
     }
 });
+
+app.post('/refresh', async(req, res) => {
+    const refreshToken = req.cookies.refreshToken
+    if(!refreshToken) return res.sendStatus(401);
+
+    try{
+        const user = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+        const newAccessToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, { expiresIn:'1h'});
+
+        res.cookie('accessToken', newAccessToken,{
+            httpOnly:true,
+            sameSite: 'Lax',
+            secure:false,
+            maxAge:3600000
+        });
+    } catch{
+        return res.sendStatus(403);
+    }
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)

@@ -9,21 +9,44 @@ import User from './components/User'
 import { useEffect, useState } from 'react'
 
 function App() {
-  const [message, setMessage] = useState('Loading...');
-  const [user, setUser] = useState('Login')
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    fetch('http://localhost:3001/me', { credentials: 'include' })
+    fetch('http://localhost:3001/me', { credentials: 'include', method: 'GET' })
 
       .then(res => {
-        if (!res.ok) setUser('Login')
+        if (res.status === 304) {
+          console.log("use cached data")
+          return;
+        } else if (res.status === 401) {
+          try{
+          let refreshRes = fetch('http://localhost:3001/refresh', { credentials: 'include', method: 'POST' })
+          if (!refreshRes.ok) {
+            throw new Error("Refresh failed")
+          }
+
+          res = fetch('http://localhost:3001/me', { credentials: 'include' })
+
+          if(!res.ok){
+            throw new Error("Unauthorized after refresh")
+          }} catch(err) {
+            console.log(err.message)
+            setUser('Login')
+          }
+
+        } else if (!res.ok) {
+          setUser('Login')
+          throw new Error('Unauthorized try loggin in again')
+        }
         return res.json()
       })
       .then(data => {
-        setUser(data.username)
+        if (data) {
+          setUser(data.username)
+        }
       })
-      .catch(() => {
-        setUser('Login');
+      .catch(err => {
+        console.error(err.message)
       })
   }, []);
 
@@ -36,15 +59,15 @@ function App() {
             <li><Link to={"/"}>home</Link></li>
             <li><Link to={"/Shop"}>shop</Link></li>
             <li><Link to={"/About"}>about</Link></li>
-            {user==='Login' ? (<li><Link to={"/Login"}>login</Link></li>):(<li><Link to={"/User"}>{user}</Link></li>)}
+            {user === 'Login' ? (<li><Link to={"/Login"}>login</Link></li>) : (<li><Link to={"/User"}>{user}</Link></li>)}
           </ul>
         </div>
       </header>
       <Routes>
         <Route path='/' element={<Game />} />
-        <Route path='/shop' element={<Shop />} />
+        <Route path='/shop' element={<Shop setUser={setUser}/>} />
         <Route path='/about' element={<About />} />
-        <Route path='/user' element={<User />}/>
+        <Route path='/user' element={<User />} />
         <Route path='/login' element={<Login setUser={setUser} />} />
       </Routes>
 

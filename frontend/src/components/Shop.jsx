@@ -4,24 +4,25 @@ import shopItems from './shopItems'
 import { useState } from 'react'
 import { shopEffects } from '../components/shopEffects'
 
-const Shop = () => {
+const Shop = ({setUser}) => {
+    fetch('/me',{})
     const [guestData, setGuestData] = useState(() => {
         return JSON.parse(localStorage.getItem("rj_guest_data"))
     })
 
-    const handlePurchase = (item) =>{
-        if (guestData.pachinkoPoints>=item.cost && !guestData.ownedUpgrades.includes(item.id)){
-            const updatedGuestData={
+    const handlePurchase = (item) => {
+        if (guestData.pachinkoPoints >= item.cost && !guestData.ownedUpgrades.includes(item.id)) {
+            const updatedGuestData = {
                 pachinkoHighscore: guestData.pachinkoHighscore,
                 pachinkoGameState: guestData.pachinkoGameState,
-                pachinkoPoints: guestData.pachinkoPoints-item.cost,
+                pachinkoPoints: guestData.pachinkoPoints - item.cost,
                 ownedUpgrades: [...guestData.ownedUpgrades, item.id]
             };
 
-            if (item.effectKey && shopEffects[item.effectKey]){
+            if (item.effectKey && shopEffects[item.effectKey]) {
                 shopEffects[item.effectKey](updatedGuestData.pachinkoGameState);
             };
-            
+
             setGuestData(updatedGuestData)
             localStorage.setItem("rj_guest_data", JSON.stringify(updatedGuestData))
         }
