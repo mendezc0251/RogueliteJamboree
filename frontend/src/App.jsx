@@ -10,44 +10,38 @@ import { useEffect, useState } from 'react'
 
 function App() {
   const [user, setUser] = useState(null)
+  const getUser = async () => {
+    try {
+      let res = await fetch('http://localhost:3001/me', { credentials: 'include', method: 'GET' });
+
+      if (res.status === 304) {
+        console.log("use cached data");
+        return;
+      }
+
+      if (res.status === 401) {
+        const refreshRes = await fetch('http://localhost:3001/refresh', { method: 'POST', credentials: 'include' });
+
+        if (!refreshRes.ok) {
+          throw new Error("Refresh failed");
+        }
+
+        res = await fetch('http://localhost:3001/me', { credentials: 'include', method: 'GET' });
+
+        if (!res.ok) {
+          throw new Error("Unauthorized after refresh")
+        }
+      }
+      const data = await res.json();
+      setUser(data.username);
+    } catch (err) {
+      console.error(err.message);
+      setUser('Login')
+    }
+  };
 
   useEffect(() => {
-    fetch('http://localhost:3001/me', { credentials: 'include', method: 'GET' })
-
-      .then(res => {
-        if (res.status === 304) {
-          console.log("use cached data")
-          return;
-        } else if (res.status === 401) {
-          try{
-          let refreshRes = fetch('http://localhost:3001/refresh', { credentials: 'include', method: 'POST' })
-          if (!refreshRes.ok) {
-            throw new Error("Refresh failed")
-          }
-
-          res = fetch('http://localhost:3001/me', { credentials: 'include' })
-
-          if(!res.ok){
-            throw new Error("Unauthorized after refresh")
-          }} catch(err) {
-            console.log(err.message)
-            setUser('Login')
-          }
-
-        } else if (!res.ok) {
-          setUser('Login')
-          throw new Error('Unauthorized try loggin in again')
-        }
-        return res.json()
-      })
-      .then(data => {
-        if (data) {
-          setUser(data.username)
-        }
-      })
-      .catch(err => {
-        console.error(err.message)
-      })
+    getUser();
   }, []);
 
   return (
@@ -65,7 +59,7 @@ function App() {
       </header>
       <Routes>
         <Route path='/' element={<Game />} />
-        <Route path='/shop' element={<Shop setUser={setUser}/>} />
+        <Route path='/shop' element={<Shop setUser={setUser} user={user} getUser={getUser} />} />
         <Route path='/about' element={<About />} />
         <Route path='/user' element={<User />} />
         <Route path='/login' element={<Login setUser={setUser} />} />

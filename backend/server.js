@@ -115,9 +115,25 @@ app.post('/refresh', async(req, res) => {
             secure:false,
             maxAge:3600000
         });
+        return res.sendStatus(200);
     } catch{
         return res.sendStatus(403);
     }
+})
+
+app.get('/user-shop-data', async(req, res)=>{
+    const token = req.cookies.accessToken
+    if(!token) return res.sendStatus(401)
+    
+    try{
+        await connectDB()
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const user = await User.findOne({ username: decoded.username })
+        res.json({rj_data: user.rj_data})
+    } catch(err){
+        console.log(err)
+    }
+
 })
 
 app.listen(PORT, () => {

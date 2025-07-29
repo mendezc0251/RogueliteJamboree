@@ -1,29 +1,44 @@
 import './Shop.css'
 import ShopCard from './ShopCard'
 import shopItems from './shopItems'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { shopEffects } from '../components/shopEffects'
 
-const Shop = ({setUser}) => {
-    fetch('/me',{})
-    const [guestData, setGuestData] = useState(() => {
-        return JSON.parse(localStorage.getItem("rj_guest_data"))
+const Shop = ({ setUser, user, getUser }) => {
+
+    useEffect(() => {
+        getUser()
+    })
+
+
+
+    const [data, setData] = useState(() => {
+        if (user === "Login") {
+            return JSON.parse(localStorage.getItem("rj_guest_data"))
+        } else {
+            fetch('http://localhost:3001/user-shop-data', { credentials: 'include', method: 'GET' })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.rj_data)
+                    return data.rj_data;
+                });
+        }
     })
 
     const handlePurchase = (item) => {
-        if (guestData.pachinkoPoints >= item.cost && !guestData.ownedUpgrades.includes(item.id)) {
+        if (data.pachinkoPoints >= item.cost && !data.ownedUpgrades.includes(item.id)) {
             const updatedGuestData = {
-                pachinkoHighscore: guestData.pachinkoHighscore,
-                pachinkoGameState: guestData.pachinkoGameState,
-                pachinkoPoints: guestData.pachinkoPoints - item.cost,
-                ownedUpgrades: [...guestData.ownedUpgrades, item.id]
+                pachinkoHighscore: data.pachinkoHighscore,
+                pachinkoGameState: data.pachinkoGameState,
+                pachinkoPoints: data.pachinkoPoints - item.cost,
+                ownedUpgrades: [...data.ownedUpgrades, item.id]
             };
 
             if (item.effectKey && shopEffects[item.effectKey]) {
                 shopEffects[item.effectKey](updatedGuestData.pachinkoGameState);
             };
 
-            setGuestData(updatedGuestData)
+            setData(updatedGuestData)
             localStorage.setItem("rj_guest_data", JSON.stringify(updatedGuestData))
         }
     }
@@ -31,13 +46,13 @@ const Shop = ({setUser}) => {
     return (
         <>
             <div className="container">
-                <h2>Your Points: {guestData.pachinkoPoints}</h2>
+                <h2>Your Points: {data.pachinkoPoints}</h2>
                 <div className="shop-grid">
                     {shopItems.map((item) =>
                         <ShopCard
                             key={item.id}
                             item={item}
-                            owned={guestData.ownedUpgrades.includes(item.id)}
+                            owned={data.ownedUpgrades.includes(item.id)}
                             onBuy={() => handlePurchase(item)}
                         />
                     )}
