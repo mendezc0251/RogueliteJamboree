@@ -6,24 +6,38 @@ import { shopEffects } from '../components/shopEffects'
 
 const Shop = ({ setUser, user, getUser }) => {
 
-    useEffect(() => {
-        getUser()
-    })
-
 
 
     const [data, setData] = useState(() => {
         if (user === "Login") {
             return JSON.parse(localStorage.getItem("rj_guest_data"))
         } else {
+            return null;
+        }
+    })
+
+    useEffect(() => {
+        console.log("getting user")
+        getUser();
+    }, []);
+
+    useEffect(() => {
+        if (user !== 'Login') {
             fetch('http://localhost:3001/user-shop-data', { credentials: 'include', method: 'GET' })
                 .then(res => res.json())
                 .then(data => {
                     console.log(data.rj_data)
-                    return data.rj_data;
+                    setData(data.rj_data)
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err)
                 });
         }
-    })
+
+    }, [user]);
+
+
+
 
     const handlePurchase = (item) => {
         if (data.pachinkoPoints >= item.cost && !data.ownedUpgrades.includes(item.id)) {
@@ -43,6 +57,7 @@ const Shop = ({ setUser, user, getUser }) => {
         }
     }
 
+    if(!data){return <p>Loading shop...</p>}
     return (
         <>
             <div className="container">
