@@ -51,13 +51,23 @@ const Shop = ({ setUser, user, getUser }) => {
             if (item.effectKey && shopEffects[item.effectKey]) {
                 shopEffects[item.effectKey](updatedGuestData.pachinkoGameState);
             };
-
+            fetch('http://localhost:3001/purchase', {
+                credentials: 'include', method: 'POST', headers: { 'Content-type': 'application/json' },
+                body: JSON.stringify({ updatedGuestData })
+            })
+                .then(res => res.json())
+                .catch(err => {
+                    console.error("Fetch error:", err)
+                });
             setData(updatedGuestData)
-            localStorage.setItem("rj_guest_data", JSON.stringify(updatedGuestData))
+            if (user === 'Login') {
+                localStorage.setItem("rj_guest_data", JSON.stringify(updatedGuestData))
+            }
+
         }
     }
 
-    if(!data){return <p>Loading shop...</p>}
+    if (!data) { return <p>Loading shop...</p> }
     return (
         <>
             <div className="container">

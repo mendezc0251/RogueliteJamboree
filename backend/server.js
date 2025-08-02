@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => {
     }
 
     const accessToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' })
-    const refreshToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, {expiresIn: '7d'})
+    const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -46,14 +46,14 @@ app.post('/login', async (req, res) => {
         maxAge: 3600000
     })
 
-    res.cookie('refreshToken', refreshToken,{
+    res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'Lax',
-        maxAge:604800000
+        maxAge: 604800000
     })
     // TODO: configure receiving of rj_data on frontend
-    res.json({ message: 'Logged in successfully', username:user.username, rj_guest_data:user.rj_data });
+    res.json({ message: 'Logged in successfully', username: user.username, rj_guest_data: user.rj_data });
 })
 
 
@@ -86,13 +86,13 @@ app.post('/register', async (req, res) => {
 
 app.get('/me', async (req, res) => {
     const token = req.cookies.accessToken
-    if(!token) return res.sendStatus(401)
+    if (!token) return res.sendStatus(401)
 
     try {
         await connectDB()
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         console.log(decoded)
-        const user = await User.findOne({username:decoded.username}).select('username')
+        const user = await User.findOne({ username: decoded.username }).select('username')
         res.json({ username: user.username })
     } catch (err) {
         console.log(err)
@@ -100,38 +100,66 @@ app.get('/me', async (req, res) => {
     }
 });
 
-app.post('/refresh', async(req, res) => {
+app.post('/refresh', async (req, res) => {
     const refreshToken = req.cookies.refreshToken
-    if(!refreshToken) return res.sendStatus(401);
+    if (!refreshToken) return res.sendStatus(401);
 
-    try{
+    try {
         const user = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
-        const newAccessToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, { expiresIn:'1h'});
+        const newAccessToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.cookie('accessToken', newAccessToken,{
-            httpOnly:true,
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
             sameSite: 'Lax',
-            secure:false,
-            maxAge:3600000
+            secure: false,
+            maxAge: 3600000
         });
         return res.sendStatus(200);
-    } catch{
+    } catch {
         return res.sendStatus(403);
     }
 })
 
-app.get('/user-shop-data', async(req, res)=>{
+app.get('/user-shop-data', async (req, res) => {
     const token = req.cookies.accessToken
-    if(!token) return res.sendStatus(401)
-    
-    try{
+    if (!token) return res.sendStatus(401)
+
+    try {
         await connectDB()
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const user = await User.findOne({ username: decoded.username })
-        res.json({rj_data: user.rj_data})
-    } catch(err){
+        res.json({ rj_data: user.rj_data })
+    } catch (err) {
         console.log(err)
+    }
+
+})
+
+app.post('/purchase', async (req, res) => {
+    const { updatedGuestData } = req.body;
+    console.log(updatedGuestData)
+    const token = req.cookies.accessToken;
+    if (!token) return res.sendStatus(401)
+
+    try {
+        await connectDB()
+        console.log('Mongoose connection readyState:', require("mongoose").connection.readyState)
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const result = await User.updateOne({ username: decoded.username }, { $set: { rj_data: updatedGuestData } }, {runValidators: true});
+
+        console.log(result)
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ message: 'User not found or no changes' })
+        }
+
+        res.status(200).json({ message: 'Purchase data updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' })
     }
 
 })
