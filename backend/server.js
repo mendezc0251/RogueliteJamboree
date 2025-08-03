@@ -121,7 +121,7 @@ app.post('/refresh', async (req, res) => {
     }
 })
 
-app.get('/user-shop-data', async (req, res) => {
+app.get('/user-data', async (req, res) => {
     const token = req.cookies.accessToken
     if (!token) return res.sendStatus(401)
 
@@ -157,6 +157,34 @@ app.post('/purchase', async (req, res) => {
         }
 
         res.status(200).json({ message: 'Purchase data updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' })
+    }
+
+})
+
+app.post('/set-user-data', async (req, res) => {
+    const { data } = req.body;
+    console.log(data)
+    const token = req.cookies.accessToken;
+    if (!token) return res.sendStatus(401)
+
+    try {
+        await connectDB()
+        console.log('Mongoose connection readyState:', require("mongoose").connection.readyState)
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const result = await User.updateOne({ username: decoded.username }, { $set: { rj_data: data } }, {runValidators: true});
+
+        console.log(result)
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ message: 'User not found or no changes' })
+        }
+
+        res.status(200).json({ message: 'data updated successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' })

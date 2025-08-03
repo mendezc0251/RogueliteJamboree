@@ -5,7 +5,7 @@ import { GameObject } from './GameObject'
 import { Upgrades } from './Upgrades'
 
 console.log("initCanvas called")
-export function initCanvas(canvas) {
+export async function initCanvas(canvas, user, getUser) {
     let currentScene = "menu";
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
@@ -83,23 +83,40 @@ export function initCanvas(canvas) {
                 && mouseY >= button.y && mouseY <= button.y + button.height
         })
     }
-    let guestData = JSON.parse(localStorage.getItem("rj_guest_data"))
+    // Load all the data
+    getUser()
+    let data = null;
+
+    if (user === 'Login') {
+        data = JSON.parse(localStorage.getItem("rj_guest_data"))
+    } else {
+        try {
+            const res = await fetch('http://localhost:3001/user-data', { credentials: 'include', method: 'GET' });
+            const fetchedData = await res.json();
+            data = fetchedData.rj_data
+        } catch (err) {
+            console.error("Fetch error:", err)
+        }
+    }
+
     let gameState = {
-                    bfNum: 0.5,
-                    multiplier: ["x2", "x1", "x1", "x1", "x.5"],
-                    coins: 1,
-                    pegHits: 1,
-                    maxWorldHeight: 1200,
-                    pegRows: 3,
-                    round: 1,
-                    rounds: 5,
-                    ammo: 2,
-                    maxAmmo: 2,
-                    totalScore: 0,
-                    score: 0,
-                }
-    if(guestData){
-        gameState = guestData.pachinkoGameState
+        bfNum: 0.5,
+        multiplier: ["x2", "x1", "x1", "x1", "x.5"],
+        coins: 1,
+        pegHits: 1,
+        maxWorldHeight: 1200,
+        pegRows: 3,
+        round: 1,
+        rounds: 5,
+        ammo: 2,
+        maxAmmo: 2,
+        totalScore: 0,
+        score: 0,
+    }
+
+    if (data && data.pachinkoGameState) {
+        gameState = data.pachinkoGameState
+        console.log("Game State loaded from backend: " + gameState)
     }
 
     const leftWallX = 119
@@ -207,14 +224,49 @@ export function initCanvas(canvas) {
         })
     }
 
-    function handleRoundEnd() {
+    async function handleRoundEnd() {
         if (gameState.round == gameState.rounds) {
-            const guestData = JSON.parse(localStorage.getItem('rj_guest_data'))
-            guestData.pachinkoPoints = (guestData.pachinkoPoints) + gameState.totalScore
-            if (gameState.totalScore > guestData.pachinkoHighscore) {
-                guestData.pachinkoHighscore = gameState.totalScore
+            getUser()
+            let data = null;
+
+            if (user === 'Login') {
+                data = JSON.parse(localStorage.getItem("rj_guest_data"))
+            } else {
+                try {
+                    const res = await fetch('http://localhost:3001/user-data', { credentials: 'include', method: 'GET' });
+                    const fetchedData = await res.json();
+                    data = fetchedData.rj_data
+                } catch (err) {
+                    console.error("Fetch error:", err)
+                }
             }
-            localStorage.setItem("rj_guest_data", JSON.stringify(guestData))
+            data.pachinkoPoints = (data.pachinkoPoints) + gameState.totalScore
+            if (gameState.totalScore > data.pachinkoHighscore) {
+                data.pachinkoHighscore = gameState.totalScore
+            }
+            if (user === 'Login') {
+                localStorage.setItem("rj_guest_data", JSON.stringify(data))
+            } else {
+                fetch('http://localhost:3001/set-user-data', {
+                    credentials: 'include', method: 'POST', headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify({ data })
+                })
+                    .then(async (res) => {
+                        const text = await res.json();
+                        try {
+                            console.log("Server responded with JSON:", res.json)
+                            return json;
+                        } catch(e){
+                            console.error("Response is not valid JSON:", text);
+                            throw new Error("Invalid JSON response")
+                        }
+                        
+                    })
+                    .catch(err => {
+                        console.error("Fetch error:", err)
+                    });
+            }
+
 
 
             currentScene = "gameoverPachinko"
@@ -343,10 +395,23 @@ export function initCanvas(canvas) {
     }
 
     // function to reset Pachinko game
-    function resetPachinkoGameState() {
-        guestData = JSON.parse(localStorage.getItem("rj_guest_data"))
+    async function resetPachinkoGameState() {
+        getUser()
+        let data = null;
+
+        if (user === 'Login') {
+            data = JSON.parse(localStorage.getItem("rj_guest_data"))
+        } else {
+            try {
+                const res = await fetch('http://localhost:3001/user-data', { credentials: 'include', method: 'GET' });
+                const fetchedData = await res.json();
+                data = fetchedData.rj_data
+            } catch (err) {
+                console.error("Fetch error:", err)
+            }
+        }
         console.log("resetting game board")
-        gameState = guestData.pachinkoGameState
+        gameState = data.pachinkoGameState
 
         pegs = generatePegs(gameState.pegRows)
 
@@ -453,7 +518,6 @@ export function initCanvas(canvas) {
             })
         }
         else if (currentScene === "pachinko") {
-
             if (coins.length <= 0 && gameState.ammo != 0) {
                 gameState.score = 0
                 let offset = 0

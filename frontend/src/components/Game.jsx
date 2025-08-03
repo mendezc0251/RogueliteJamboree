@@ -4,34 +4,28 @@ import { initCanvas } from '../game/initCanvas'
 import '../App.css'
 import IntroModal from './IntroModal'
 
-function Game() {
+function Game({ setUser, user, getUser }) {
     const canvasRef = useRef(null)
     const location = useLocation()
     const navigate = useNavigate()
+    const hasInitializedCanvas = useRef(false)
     // set guestData to players chosen data type or if not chosen to 0
-    const [guestData, setGuestData] = useState(()=>{
+    const [data, setData] = useState(()=>{
         if(JSON.parse(localStorage.getItem("rj_guest_data"))){
             return JSON.parse(localStorage.getItem("rj_guest_data"))
         } else {
-            return {
-            pachinkoPoints:0,
-            pachinkoHighscore:0
-            }
+            return null;
         }
     })
 
     useEffect(() => {
-        
-
-        if (location.pathname === '/' && canvasRef.current) {
-            initCanvas(canvasRef.current)
-        }
+        getUser();
         // check if highScore or points updates every second
         // TODO: change to event listener when gameOver in initCanvas
         const interval = setInterval(()=>{
             const localData = JSON.parse(localStorage.getItem("rj_guest_data"))
             if (localData){
-                setGuestData(prev =>{
+                setData(prev =>{
                     if(prev.pachinkoPoints!==localData.pachinkoPoints ||
                         prev.pachinkoHighscore!==localData.pachinkoHighscore
                     ){
@@ -47,6 +41,32 @@ function Game() {
 
         return () => clearInterval(interval)
     }, [location.pathname]);
+
+    useEffect(() => {
+        if (user !== 'Login') {
+            fetch('http://localhost:3001/user-data', { credentials: 'include', method: 'GET' })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.rj_data)
+                    setData(data.rj_data)
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err)
+                });
+        }
+
+    }, [user]);
+
+    useEffect(()=>{
+        if(!hasInitializedCanvas.current&&data&&canvasRef.current&&location.pathname==='/'){
+            hasInitializedCanvas.current=true;
+            console.log("initializing canvas")
+            initCanvas(canvasRef.current, user, getUser)
+        }
+
+    },[data, canvasRef, location.pathname])
+
+
     // function to handle player using guest option
     const handleGuest = () => {
         console.log("parent handleGuest called")
@@ -83,10 +103,11 @@ function Game() {
     const handleLogin = () => {
         navigate('/login');
     }
-
+    
+    if (!data) { return <p>Loading game...</p> }
     return (
         <div className="container">
-            <h1 className="score-points">High Score: {guestData.pachinkoHighscore} Points: {guestData.pachinkoPoints}</h1>
+            <h1 className="score-points">High Score: {data.pachinkoHighscore} Points: {data.pachinkoPoints}</h1>
             <div className='game-container'>
                 <canvas className="game" ref={canvasRef} width="1280" height="720"></canvas>
             </div>

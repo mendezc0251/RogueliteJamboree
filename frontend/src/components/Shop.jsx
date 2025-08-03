@@ -23,7 +23,7 @@ const Shop = ({ setUser, user, getUser }) => {
 
     useEffect(() => {
         if (user !== 'Login') {
-            fetch('http://localhost:3001/user-shop-data', { credentials: 'include', method: 'GET' })
+            fetch('http://localhost:3001/user-data', { credentials: 'include', method: 'GET' })
                 .then(res => res.json())
                 .then(data => {
                     console.log(data.rj_data)

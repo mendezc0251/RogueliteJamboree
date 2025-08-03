@@ -58,7 +58,7 @@ function App() {
         </div>
       </header>
       <Routes>
-        <Route path='/' element={<Game />} />
+        <Route path='/' element={<Game setUser={setUser} user={user} getUser={getUser} />} />
         <Route path='/shop' element={<Shop setUser={setUser} user={user} getUser={getUser} />} />
         <Route path='/about' element={<About />} />
         <Route path='/user' element={<User />} />
