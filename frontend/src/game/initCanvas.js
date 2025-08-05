@@ -26,6 +26,32 @@ export async function initCanvas(canvas, user, getUser) {
     let mouseX = 0
     let mouseY = 0
 
+    const floatingTexts = [];
+
+    function updateFloatingTexts() {
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            const text = floatingTexts[i]
+            text.y -= 0.5;
+            text.opacity -= 0.015;
+            text.life--;
+            if (text.life <= 0 || text.opacity <= 0) {
+                floatingTexts.splice(i, 1)
+            }
+        }
+    }
+
+    function renderFloatingTexts(ctx) {
+        ctx.font = '40px "Press Start 2P"'
+        ctx.textAlign = "center"
+        
+        floatingTexts.forEach(text=>{
+            ctx.fillStyle = `#F9F7F1, $(text.opacity)`
+            ctx.fillText(text.value, text.x, text.y)
+
+        })
+        
+    }
+
     // Track mouse clicks
     canvas.addEventListener("click", function (event) {
         const rect = canvas.getBoundingClientRect()
@@ -52,6 +78,7 @@ export async function initCanvas(canvas, user, getUser) {
         }
         else if (currentScene === "pachinko") {
             updatePachinko()
+            updateFloatingTexts()
         }
         else if (currentScene === "upgradePachinko") {
             updateUpgradePachinko()
@@ -256,11 +283,11 @@ export async function initCanvas(canvas, user, getUser) {
                         try {
                             console.log("Server responded with JSON:", res.json)
                             return json;
-                        } catch(e){
+                        } catch (e) {
                             console.error("Response is not valid JSON:", text);
                             throw new Error("Invalid JSON response")
                         }
-                        
+
                     })
                     .catch(err => {
                         console.error("Fetch error:", err)
@@ -359,6 +386,13 @@ export async function initCanvas(canvas, user, getUser) {
                         coin.vx += (Math.random() < 0.5 ? -1 : 1) * 3
                     }
                     if (peg.hits != 0 && peg.hit != true) {
+                        floatingTexts.push({
+                            x: coin.x,
+                            y: coin.y-cameraY,
+                            value: '+1',
+                            opacity: 1,
+                            life: 60
+                        })
                         peg.hits -= 1
                         gameState.score += 1
                         console.log(gameState.score)
@@ -470,6 +504,7 @@ export async function initCanvas(canvas, user, getUser) {
         }
         else if (currentScene === "pachinko") {
             renderPachinko()
+            renderFloatingTexts(ctx)
         }
         else if (currentScene === "upgradePachinko") {
             renderUpgradePachinko()

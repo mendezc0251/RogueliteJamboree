@@ -14,7 +14,7 @@ function Game({ setUser, user, getUser }) {
         if(JSON.parse(localStorage.getItem("rj_guest_data"))){
             return JSON.parse(localStorage.getItem("rj_guest_data"))
         } else {
-            return null;
+            return {pachinkoHighscore:0, pachinkoPoints:0};
         }
     })
 
@@ -104,7 +104,7 @@ function Game({ setUser, user, getUser }) {
         navigate('/login');
     }
     
-    if (!data) { return <p>Loading game...</p> }
+    if (!data && localStorage.getItem("modalSelected")) { return <p>Loading game...</p> }
     return (
         <div className="container">
             <h1 className="score-points">High Score: {data.pachinkoHighscore} Points: {data.pachinkoPoints}</h1>
