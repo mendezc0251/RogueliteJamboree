@@ -4,6 +4,8 @@ import { resources } from "./Resources"
 import { GameObject } from './GameObject'
 import { Upgrades } from './Upgrades'
 
+
+
 console.log("initCanvas called")
 export async function initCanvas(canvas, user, getUser) {
     let currentScene = "menu";
@@ -43,13 +45,13 @@ export async function initCanvas(canvas, user, getUser) {
     function renderFloatingTexts(ctx) {
         ctx.font = '40px "Press Start 2P"'
         ctx.textAlign = "center"
-        
-        floatingTexts.forEach(text=>{
+
+        floatingTexts.forEach(text => {
             ctx.fillStyle = `#F9F7F1, $(text.opacity)`
             ctx.fillText(text.value, text.x, text.y)
 
         })
-        
+
     }
 
     // Track mouse clicks
@@ -388,7 +390,7 @@ export async function initCanvas(canvas, user, getUser) {
                     if (peg.hits != 0 && peg.hit != true) {
                         floatingTexts.push({
                             x: coin.x,
-                            y: coin.y-cameraY,
+                            y: coin.y - cameraY,
                             value: '+1',
                             opacity: 1,
                             life: 60
@@ -486,8 +488,27 @@ export async function initCanvas(canvas, user, getUser) {
         })
 
     }
+    // Define slot symbol rows for slot game
+    let slotSymbols = [
+        { text: "Fish", x: displayWidth * (1 / 6), y: 100 }, { text: "Bird", x: displayWidth * (1 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (1 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (1 / 6), y: 400 }, { text: "Apple", x: displayWidth * (1 / 6), y: 500 },
+        { text: "Fish", x: displayWidth * (3 / 6), y: 100 }, { text: "Bird", x: displayWidth * (3 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (3 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (3 / 6), y: 400 }, { text: "Apple", x: displayWidth * (3 / 6), y: 500 },
+        { text: "Fish", x: displayWidth * (5 / 6), y: 100 }, { text: "Bird", x: displayWidth * (5 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (5 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (5 / 6), y: 400 }, { text: "Apple", x: displayWidth * (5 / 6), y: 500 }
+    ]
+    // Function used to spin the slot symbols
+    function spin() {
+        slotSymbols.forEach(symbol => {
+            if (symbol.y <= 600) {
+                symbol.y += 1
+            } else {
+                symbol.y = 100
+            }
+
+        })
+
+    }
 
     function updateSlots() {
+        spin()
 
     }
 
@@ -783,8 +804,21 @@ export async function initCanvas(canvas, user, getUser) {
             ctx.fillText(button.text, button.x + (button.width / 2), button.y + (button.height / 2))
         })
     }
+
     function renderSlots() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)
+
+        ctx.fillStyle = "#2D2D2D"
+        ctx.fillRect(0, 0, displayWidth, displayHeight)
+
+        slotSymbols.forEach(symbol => {
+            ctx.font = '30px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(symbol.text, symbol.x, symbol.y)
+        })
+
     }
     function renderChess() {
         ctx.clearRect(0, 0, displayWidth, displayHeight)

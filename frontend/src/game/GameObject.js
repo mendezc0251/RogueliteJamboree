@@ -1,6 +1,7 @@
 export class GameObject{
-    constructor({position}){
-        this.position = position
+    constructor({x,y}){
+        this.x = x
+        this.y = y
         this.children = [];
     }
     // entry point of the loop
@@ -15,8 +16,8 @@ export class GameObject{
     }
 
     draw(ctx,x,y){
-        const drawPosX=x+this.position.x;
-        const drawPosY = y+this.position.y;
+        const drawPosX=x+this.x;
+        const drawPosY = y+this.y;
 
         this.drawImage(ctx, drawPosX, drawPosY)
 
