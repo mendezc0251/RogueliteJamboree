@@ -128,7 +128,7 @@ export async function initCanvas(canvas, user, getUser) {
         }
     }
 
-    let gameState = {
+    let pachinkoGameState = {
         bfNum: 0.5,
         multiplier: ["x2", "x1", "x1", "x1", "x.5"],
         coins: 1,
@@ -143,9 +143,9 @@ export async function initCanvas(canvas, user, getUser) {
         score: 0,
     }
 
-    if (data && data.pachinkoGameState) {
-        gameState = data.pachinkoGameState
-        console.log("Game State loaded from backend: " + gameState)
+    if (data && data.pachinkopachinkopachinkoGameState) {
+        pachinkoGameState = data.pachinkopachinkoGameState
+        console.log("Game State loaded from backend: " + pachinkoGameState)
     }
 
     const leftWallX = 119
@@ -168,30 +168,30 @@ export async function initCanvas(canvas, user, getUser) {
             const yOffset = i * rowSpacing * 2
 
             for (let x of rowOffsets[0]) {
-                pegs.push({ x, y: firstRowY + yOffset, radius: pegRadius, hit: false, hits: gameState.pegHits })
+                pegs.push({ x, y: firstRowY + yOffset, radius: pegRadius, hit: false, hits: pachinkoGameState.pegHits })
             }
 
             for (let x of rowOffsets[1]) {
-                pegs.push({ x, y: secondRowY + yOffset, radius: pegRadius, hit: false, hits: gameState.pegHits })
+                pegs.push({ x, y: secondRowY + yOffset, radius: pegRadius, hit: false, hits: pachinkoGameState.pegHits })
             }
         }
         return pegs
     }
-    let pegs = generatePegs(gameState.pegRows)
+    let pegs = generatePegs(pachinkoGameState.pegRows)
 
     const bottomWalls = [
-        { x: 199, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 279, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 359, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 439, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 519, y: gameState.maxWorldHeight - 48, width: 2, height: 48 },
-        { x: 599, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 679, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 759, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 839, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 919, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 999, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
-        { x: 1079, y: gameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 199, y: pachinkoGameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 279, y: pachinkoGameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 359, y: pachinkoGameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 439, y: pachinkoGameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 519, y: pachinkoGameState.maxWorldHeight - 48, width: 2, height: 48 },
+        { x: 599, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 679, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 759, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 839, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 919, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 999, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
+        { x: 1079, y: pachinkoGameState.maxWorldHeight - cameraY - 48, width: 2, height: 48 },
     ]
     let multipliers = [
         { text: null, textX: 159, textY: displayHeight - 24, x: 119, y: cameraY + displayHeight },
@@ -210,7 +210,7 @@ export async function initCanvas(canvas, user, getUser) {
     ]
 
     multipliers.forEach(multi => {
-        multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
+        multi.text = pachinkoGameState.multiplier[Math.floor(Math.random() * pachinkoGameState.multiplier.length)]
     })
 
     const dropZone = {
@@ -227,17 +227,17 @@ export async function initCanvas(canvas, user, getUser) {
             return true
         }
         else {
-            console.log(gameState.score + " Before multiplier")
+            console.log(pachinkoGameState.score + " Before multiplier")
             multiScore(coin)
-            console.log(gameState.score + " After multiplier")
+            console.log(pachinkoGameState.score + " After multiplier")
             if (coins.length == 1) {
-                gameState.totalScore += gameState.score
+                pachinkoGameState.totalScore += pachinkoGameState.score
                 multipliers.forEach(multi => {
-                    multi["text"] = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
+                    multi["text"] = pachinkoGameState.multiplier[Math.floor(Math.random() * pachinkoGameState.multiplier.length)]
                 })
                 pegs.forEach(peg => {
                     peg.hit = false
-                    peg.hits = gameState.pegHits
+                    peg.hits = pachinkoGameState.pegHits
                 })
             }
 
@@ -248,13 +248,13 @@ export async function initCanvas(canvas, user, getUser) {
         multipliers.forEach(multi => {
             if (c.x > multi.x && c.x < multi.x + 80) {
                 console.log(parseFloat(("" + multi.text).slice(1)))
-                gameState.score = Math.floor(gameState.score * parseFloat(("" + multi.text).slice(1)))
+                pachinkoGameState.score = Math.floor(pachinkoGameState.score * parseFloat(("" + multi.text).slice(1)))
             }
         })
     }
 
     async function handleRoundEnd() {
-        if (gameState.round == gameState.rounds) {
+        if (pachinkoGameState.round == pachinkoGameState.rounds) {
             getUser()
             let data = null;
 
@@ -269,9 +269,9 @@ export async function initCanvas(canvas, user, getUser) {
                     console.error("Fetch error:", err)
                 }
             }
-            data.pachinkoPoints = (data.pachinkoPoints) + gameState.totalScore
-            if (gameState.totalScore > data.pachinkoHighscore) {
-                data.pachinkoHighscore = gameState.totalScore
+            data.pachinkoPoints = (data.pachinkoPoints) + pachinkoGameState.totalScore
+            if (pachinkoGameState.totalScore > data.pachinkoHighscore) {
+                data.pachinkoHighscore = pachinkoGameState.totalScore
             }
             if (user === 'Login') {
                 localStorage.setItem("rj_guest_data", JSON.stringify(data))
@@ -303,10 +303,10 @@ export async function initCanvas(canvas, user, getUser) {
         } else {
             upgradeButtonsArr = upgradesClass.getRandomUpgrades()
             console.log("ROUND OVER!")
-            gameState.round += 1
-            console.log("Round " + gameState.round + " begin!")
-            console.log(gameState.maxAmmo)
-            gameState.ammo = gameState.maxAmmo
+            pachinkoGameState.round += 1
+            console.log("Round " + pachinkoGameState.round + " begin!")
+            console.log(pachinkoGameState.maxAmmo)
+            pachinkoGameState.ammo = pachinkoGameState.maxAmmo
             currentScene = "upgradePachinko"
         }
     }
@@ -322,7 +322,7 @@ export async function initCanvas(canvas, user, getUser) {
 
 
     function updatePachinko() {
-        if (gameState.ammo == 0 && coins.length == 0) {
+        if (pachinkoGameState.ammo == 0 && coins.length == 0) {
             handleRoundEnd();
         }
 
@@ -342,7 +342,7 @@ export async function initCanvas(canvas, user, getUser) {
 
             // handle bottom wall collisions
             bottomWalls.forEach(wall => {
-                const wallY = gameState.maxWorldHeight - wall.height
+                const wallY = pachinkoGameState.maxWorldHeight - wall.height
 
                 if (
                     coin.x + coin.radius > wall.x &&
@@ -396,8 +396,8 @@ export async function initCanvas(canvas, user, getUser) {
                             life: 60
                         })
                         peg.hits -= 1
-                        gameState.score += 1
-                        console.log(gameState.score)
+                        pachinkoGameState.score += 1
+                        console.log(pachinkoGameState.score)
                     }
                     if (peg.hits == 0) {
                         peg.hit = true
@@ -411,14 +411,14 @@ export async function initCanvas(canvas, user, getUser) {
             const targetY = lastCoin.y - displayHeight / 2
 
             cameraY += (targetY - cameraY) * 0.05
-            cameraY = Math.max(0, Math.min(cameraY, gameState.maxWorldHeight - displayHeight))
+            cameraY = Math.max(0, Math.min(cameraY, pachinkoGameState.maxWorldHeight - displayHeight))
         } else {
             cameraY += (0 - cameraY) * 0.05
         }
         coins = coins.filter(resetBoard)
     }
 
-    let upgradesClass = new Upgrades(displayWidth, displayHeight, gameState)
+    let upgradesClass = new Upgrades(displayWidth, displayHeight, pachinkoGameState)
     let upgradeButtonsArr = upgradesClass.getRandomUpgrades()
 
 
@@ -431,7 +431,7 @@ export async function initCanvas(canvas, user, getUser) {
     }
 
     // function to reset Pachinko game
-    async function resetPachinkoGameState() {
+    async function resetPachinkopachinkoGameState() {
         getUser()
         let data = null;
 
@@ -447,15 +447,15 @@ export async function initCanvas(canvas, user, getUser) {
             }
         }
         console.log("resetting game board")
-        gameState = data.pachinkoGameState
+        pachinkoGameState = data.pachinkopachinkoGameState
 
-        pegs = generatePegs(gameState.pegRows)
+        pegs = generatePegs(pachinkoGameState.pegRows)
 
-        upgradesClass = new Upgrades(displayWidth, displayHeight, gameState)
+        upgradesClass = new Upgrades(displayWidth, displayHeight, pachinkoGameState)
         upgradeButtonsArr = upgradesClass.getRandomUpgrades()
 
         multipliers.forEach(multi => {
-            multi.text = gameState.multiplier[Math.floor(Math.random() * gameState.multiplier.length)]
+            multi.text = pachinkoGameState.multiplier[Math.floor(Math.random() * pachinkoGameState.multiplier.length)]
         })
 
     }
@@ -469,13 +469,13 @@ export async function initCanvas(canvas, user, getUser) {
     const gameoverButtons = [
         {
             text: "Play Again?", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                resetPachinkoGameState()
+                resetPachinkopachinkoGameState()
                 currentScene = "pachinko"
             }
         },
         {
             text: "Menu", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                resetPachinkoGameState()
+                resetPachinkopachinkoGameState()
                 currentScene = "menu"
             }
         },
@@ -491,15 +491,24 @@ export async function initCanvas(canvas, user, getUser) {
     // Define slot symbol rows for slot game
     let spinning = true
 
+    let slotGameState = {
+        totalScore: 0,
+        score: 0
+    }
+
+    buttonX = (displayWidth - buttonWidth) * 0.75
+    let buttonX2 = (displayWidth - buttonWidth) * 0.25
+    buttonY = displayHeight * 0.85
+    buttonY2 = displayHeight * 0.85
+
     const slotButtons = [
         {
             text: "Stop", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
                 stop()
-
             }
         },
         {
-            text: "Spin", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
+            text: "Spin", x: buttonX2, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
                 spin()
             }
         },
@@ -515,22 +524,50 @@ export async function initCanvas(canvas, user, getUser) {
     function spin() {
         spinning = true
         slotSymbols.forEach(symbol => {
-            symbol.y=((symbol.y-100+11)%500)+100
+            symbol.y = ((symbol.y - 100 + 11) % 500) + 100
         })
     }
 
+
+    // Function used to stop the slots it then collects the scored symbols in an array to calculate score
     function stop() {
+        let scoredSymbols = []
         spinning = false
+
         slotSymbols.forEach(symbol => {
-            symbol.y = Math.round((symbol.y-100)/100)*100+100
+            symbol.y = Math.round((symbol.y - 100) / 100) * 100 + 100
+            if (symbol.y == 600) {
+                symbol.y = 100
+            }
         })
+
+        slotSymbols.forEach(symbol => {
+            if (symbol.y == 200) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+
+        slotSymbols.forEach(symbol => {
+            if (symbol.y == 300) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+
+        slotSymbols.forEach(symbol => {
+            if (symbol.y == 400) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+    }
+
+    function calculateScore(scoredSymbolsArray) {
+        console.log(scoredSymbolsArray)
     }
 
     function updateSlots() {
-        if (!spinning) {
-            stop()
-        } else {
+        if (spinning) {
             spin()
+        } else {
         }
 
 
@@ -598,10 +635,10 @@ export async function initCanvas(canvas, user, getUser) {
             })
         }
         else if (currentScene === "pachinko") {
-            if (coins.length <= 0 && gameState.ammo != 0) {
-                gameState.score = 0
+            if (coins.length <= 0 && pachinkoGameState.ammo != 0) {
+                pachinkoGameState.score = 0
                 let offset = 0
-                for (let i = 1; i <= gameState.coins; i++) {
+                for (let i = 1; i <= pachinkoGameState.coins; i++) {
 
                     if (i % 2 == 1 && i != 1) {
                         offset = -offset
@@ -615,13 +652,13 @@ export async function initCanvas(canvas, user, getUser) {
                         vx: 0,
                         vy: 0,
                         gravity: 0.5,
-                        bounceFactor: gameState.bfNum,
+                        bounceFactor: pachinkoGameState.bfNum,
                         filtered: false,
                         scored: false,
                     })
                 }
 
-                gameState.ammo -= 1
+                pachinkoGameState.ammo -= 1
             }
         }
         else if (currentScene === "upgradePachinko") {
@@ -630,10 +667,10 @@ export async function initCanvas(canvas, user, getUser) {
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
                     button.onClick()
-                    pegs = generatePegs(gameState.pegRows)
+                    pegs = generatePegs(pachinkoGameState.pegRows)
                     pegs.forEach(peg => {
                         peg.hit = false
-                        peg.hits = gameState.pegHits
+                        peg.hits = pachinkoGameState.pegHits
                     })
                     currentScene = "pachinko"
                     button.onClick = null
@@ -752,12 +789,12 @@ export async function initCanvas(canvas, user, getUser) {
 
 
         ctx.fillStyle = "#A8E6CF"
-        ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, gameState.maxWorldHeight)
-        ctx.fillRect(rightWallX - 4, 0 - cameraY, 8, gameState.maxWorldHeight)
+        ctx.fillRect(leftWallX - 4, 0 - cameraY, 8, pachinkoGameState.maxWorldHeight)
+        ctx.fillRect(rightWallX - 4, 0 - cameraY, 8, pachinkoGameState.maxWorldHeight)
 
         bottomWalls.forEach(wall => {
             ctx.fillStyle = "#2D2D2D"
-            ctx.fillRect(wall.x, gameState.maxWorldHeight - cameraY - 48, wall.width, wall.height)
+            ctx.fillRect(wall.x, pachinkoGameState.maxWorldHeight - cameraY - 48, wall.width, wall.height)
         })
 
         multipliers.forEach(multi => {
@@ -769,7 +806,7 @@ export async function initCanvas(canvas, user, getUser) {
         })
 
         ctx.fillStyle = "#2D2D2D"
-        ctx.fillRect(199, gameState.maxWorldHeight - cameraY - 48, 2, 48)
+        ctx.fillRect(199, pachinkoGameState.maxWorldHeight - cameraY - 48, 2, 48)
 
         pegs.forEach(peg => {
             if (pegImg.isLoaded && peg.hit == false) {
@@ -794,7 +831,7 @@ export async function initCanvas(canvas, user, getUser) {
         ctx.textAlign = "center"
         ctx.textBaseline = "left"
         ctx.fillStyle = "#F9F7F1"
-        ctx.fillText(gameState.totalScore, 100, 25)
+        ctx.fillText(pachinkoGameState.totalScore, 100, 25)
         ctx.globalAlpha = 1.0
     }
     // renders the upgrade screen after each round
