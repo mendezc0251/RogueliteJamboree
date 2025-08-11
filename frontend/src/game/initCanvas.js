@@ -489,26 +489,50 @@ export async function initCanvas(canvas, user, getUser) {
 
     }
     // Define slot symbol rows for slot game
-    let slotSymbols = [
-        { text: "Fish", x: displayWidth * (1 / 6), y: 100 }, { text: "Bird", x: displayWidth * (1 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (1 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (1 / 6), y: 400 }, { text: "Apple", x: displayWidth * (1 / 6), y: 500 },
-        { text: "Fish", x: displayWidth * (3 / 6), y: 100 }, { text: "Bird", x: displayWidth * (3 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (3 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (3 / 6), y: 400 }, { text: "Apple", x: displayWidth * (3 / 6), y: 500 },
-        { text: "Fish", x: displayWidth * (5 / 6), y: 100 }, { text: "Bird", x: displayWidth * (5 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (5 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (5 / 6), y: 400 }, { text: "Apple", x: displayWidth * (5 / 6), y: 500 }
+    let spinning = true
+
+    const slotButtons = [
+        {
+            text: "Stop", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
+                stop()
+
+            }
+        },
+        {
+            text: "Spin", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
+                spin()
+            }
+        },
     ]
+
+    let slotSymbols = [
+        { text: "Fish", x: displayWidth * (1 / 6) + 100, y: 100 }, { text: "Bird", x: displayWidth * (1 / 6) + 100, y: 200 }, { text: "Bunny", x: displayWidth * (1 / 6) + 100, y: 300 }, { text: "Pumpkin", x: displayWidth * (1 / 6) + 100, y: 400 }, { text: "Apple", x: displayWidth * (1 / 6) + 100, y: 500 },
+        { text: "Fish", x: displayWidth * (3 / 6), y: 100 }, { text: "Bird", x: displayWidth * (3 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (3 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (3 / 6), y: 400 }, { text: "Apple", x: displayWidth * (3 / 6), y: 500 },
+        { text: "Fish", x: displayWidth * (5 / 6) - 100, y: 100 }, { text: "Bird", x: displayWidth * (5 / 6) - 100, y: 200 }, { text: "Bunny", x: displayWidth * (5 / 6) - 100, y: 300 }, { text: "Pumpkin", x: displayWidth * (5 / 6) - 100, y: 400 }, { text: "Apple", x: displayWidth * (5 / 6) - 100, y: 500 }
+    ]
+
     // Function used to spin the slot symbols
     function spin() {
+        spinning = true
         slotSymbols.forEach(symbol => {
-            if (symbol.y <= 600) {
-                symbol.y += 1
-            } else {
-                symbol.y = 100
-            }
-
+            symbol.y=((symbol.y-100+11)%500)+100
         })
+    }
 
+    function stop() {
+        spinning = false
+        slotSymbols.forEach(symbol => {
+            symbol.y = Math.round((symbol.y-100)/100)*100+100
+        })
     }
 
     function updateSlots() {
-        spin()
+        if (!spinning) {
+            stop()
+        } else {
+            spin()
+        }
+
 
     }
 
@@ -618,6 +642,15 @@ export async function initCanvas(canvas, user, getUser) {
         }
         else if (currentScene === "gameoverPachinko") {
             gameoverButtons.forEach(button => {
+                const withinX = mouseX >= button.x && mouseX <= button.x + button.width
+                const withinY = mouseY >= button.y && mouseY <= button.y + button.height
+                if (withinX && withinY) {
+                    button.onClick()
+                }
+            })
+        }
+        else if (currentScene === "slots") {
+            slotButtons.forEach(button => {
                 const withinX = mouseX >= button.x && mouseX <= button.x + button.width
                 const withinY = mouseY >= button.y && mouseY <= button.y + button.height
                 if (withinX && withinY) {
@@ -817,6 +850,16 @@ export async function initCanvas(canvas, user, getUser) {
             ctx.textBaseline = "middle"
             ctx.fillStyle = "#F9F7F1"
             ctx.fillText(symbol.text, symbol.x, symbol.y)
+        })
+
+        slotButtons.forEach(button => {
+            ctx.fillStyle = button.isHovered ? "#FFD97D" : "#FFBC19"
+            ctx.fillRect(button.x, button.y, button.width, button.height)
+            ctx.font = '30px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(button.text, button.x + (button.width / 2), button.y + (button.height / 2))
         })
 
     }
