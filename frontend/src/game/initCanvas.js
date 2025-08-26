@@ -491,40 +491,53 @@ export async function initCanvas(canvas, user, getUser) {
     // Define slot symbol rows for slot game
     let spinning = true
 
+    const fruit = resources.images.fruit
+
+    let firstSlotColumn = [{ src: fruit, x: 415, y: -75, symbol: "Blank" }, { src: fruit, x: 415, y: 75, symbol: "Blank" }, { src: fruit, x: 415, y: 225, symbol: "Blank" }, { src: fruit, x: 415, y:375, symbol: "Blank"  }, { src: fruit, x: 415, y: 525, symbol: "Blank" }]
+    let secondSlotColumn = [{ src: fruit, x: displayWidth * (3 / 6), y: 100 }, { src: fruit, x: displayWidth * (3 / 6), y: 200 }, { src: fruit, x: displayWidth * (3 / 6), y: 300 }, { src: fruit, x: displayWidth * (3 / 6), y: 400 }, { src: fruit, x: displayWidth * (3 / 6), y: 500 }]
+    let thirdSlotColumn = [{ src: fruit, x: displayWidth * (5 / 6) - 100, y: 100 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 200 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 300 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 400 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 500 }]
+
     let slotGameState = {
         totalScore: 0,
-        score: 0
+        score: 0,
+        slotSpeeds:[22,33,15]
     }
 
-    buttonX = (displayWidth - buttonWidth) * 0.75
-    let buttonX2 = (displayWidth - buttonWidth) * 0.25
+    buttonWidth = displayWidth*0.1
+    buttonHeight = displayHeight*0.1
+
+    buttonX = (displayWidth - buttonWidth) * 0.95
+    let buttonX2 = (displayWidth - buttonWidth) * 0.05
     buttonY = displayHeight * 0.85
     buttonY2 = displayHeight * 0.85
 
     const slotButtons = [
         {
             text: "Stop", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                stop()
+                if(spinning){
+                    stop()
+                }
+                
             }
         },
         {
             text: "Spin", x: buttonX2, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                spin()
+                spinning=true
             }
         },
     ]
 
-    let slotSymbols = [
-        { text: "Fish", x: displayWidth * (1 / 6) + 100, y: 100 }, { text: "Bird", x: displayWidth * (1 / 6) + 100, y: 200 }, { text: "Bunny", x: displayWidth * (1 / 6) + 100, y: 300 }, { text: "Pumpkin", x: displayWidth * (1 / 6) + 100, y: 400 }, { text: "Apple", x: displayWidth * (1 / 6) + 100, y: 500 },
-        { text: "Fish", x: displayWidth * (3 / 6), y: 100 }, { text: "Bird", x: displayWidth * (3 / 6), y: 200 }, { text: "Bunny", x: displayWidth * (3 / 6), y: 300 }, { text: "Pumpkin", x: displayWidth * (3 / 6), y: 400 }, { text: "Apple", x: displayWidth * (3 / 6), y: 500 },
-        { text: "Fish", x: displayWidth * (5 / 6) - 100, y: 100 }, { text: "Bird", x: displayWidth * (5 / 6) - 100, y: 200 }, { text: "Bunny", x: displayWidth * (5 / 6) - 100, y: 300 }, { text: "Pumpkin", x: displayWidth * (5 / 6) - 100, y: 400 }, { text: "Apple", x: displayWidth * (5 / 6) - 100, y: 500 }
-    ]
-
     // Function used to spin the slot symbols
-    function spin() {
+    function spin(speed, slotSymbols) {
         spinning = true
+        const symbolHeight=150
+        const minY=-75
+        const cycleLength = symbolHeight * firstSlotColumn.length
+        
         slotSymbols.forEach(symbol => {
-            symbol.y = ((symbol.y - 100 + 11) % 500) + 100
+            let offset = ((symbol.y-minY+speed)%cycleLength+cycleLength)%cycleLength
+            symbol.y=minY+offset
+            
         })
     }
 
@@ -534,30 +547,89 @@ export async function initCanvas(canvas, user, getUser) {
         let scoredSymbols = []
         spinning = false
 
-        slotSymbols.forEach(symbol => {
+        const symbolHeight=150
+        const minY=-75
+        const cycleLength = symbolHeight * firstSlotColumn.length
+
+        firstSlotColumn.forEach(symbol => {
+            let offset = ((symbol.y-minY)%cycleLength+cycleLength)%cycleLength
+            offset=Math.round(offset/symbolHeight)*symbolHeight
+            symbol.y=minY+offset
+            if(symbol.y==675){
+                symbol.y=-75
+            }
+            console.log(symbol.y)
+        })
+
+        firstSlotColumn.forEach(symbol => {
+            if (symbol.y == 75) {
+                scoredSymbols.push(symbol.symbol)
+            }
+        })
+
+        firstSlotColumn.forEach(symbol => {
+            if (symbol.y == 225) {
+                scoredSymbols.push(symbol.symbol)
+            }
+        })
+
+        firstSlotColumn.forEach(symbol => {
+            if (symbol.y == 375) {
+                scoredSymbols.push(symbol.symbol)
+            }
+        })
+    
+        secondSlotColumn.forEach(symbol => {
             symbol.y = Math.round((symbol.y - 100) / 100) * 100 + 100
             if (symbol.y == 600) {
                 symbol.y = 100
             }
         })
 
-        slotSymbols.forEach(symbol => {
+        secondSlotColumn.forEach(symbol => {
             if (symbol.y == 200) {
                 scoredSymbols.push(symbol.text)
             }
         })
 
-        slotSymbols.forEach(symbol => {
+        secondSlotColumn.forEach(symbol => {
             if (symbol.y == 300) {
                 scoredSymbols.push(symbol.text)
             }
         })
 
-        slotSymbols.forEach(symbol => {
+        secondSlotColumn.forEach(symbol => {
             if (symbol.y == 400) {
                 scoredSymbols.push(symbol.text)
             }
         })
+
+        thirdSlotColumn.forEach(symbol => {
+            symbol.y = Math.round((symbol.y - 100) / 100) * 100 + 100
+            if (symbol.y == 600) {
+                symbol.y = 100
+            }
+        })
+
+        thirdSlotColumn.forEach(symbol => {
+            if (symbol.y == 200) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+
+        thirdSlotColumn.forEach(symbol => {
+            if (symbol.y == 300) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+
+        thirdSlotColumn.forEach(symbol => {
+            if (symbol.y == 400) {
+                scoredSymbols.push(symbol.text)
+            }
+        })
+
+        calculateScore(scoredSymbols)
     }
 
     function calculateScore(scoredSymbolsArray) {
@@ -566,7 +638,9 @@ export async function initCanvas(canvas, user, getUser) {
 
     function updateSlots() {
         if (spinning) {
-            spin()
+            spin(slotGameState.slotSpeeds[0],firstSlotColumn)
+            spin(slotGameState.slotSpeeds[1],secondSlotColumn)
+            spin(slotGameState.slotSpeeds[2],thirdSlotColumn)
         } else {
         }
 
@@ -881,7 +955,21 @@ export async function initCanvas(canvas, user, getUser) {
         ctx.fillStyle = "#2D2D2D"
         ctx.fillRect(0, 0, displayWidth, displayHeight)
 
-        slotSymbols.forEach(symbol => {
+        firstSlotColumn.forEach(symbol => {
+            if (fruit.isLoaded) {
+                ctx.drawImage(fruit.image, symbol.x, symbol.y)
+            }
+        })
+
+        secondSlotColumn.forEach(symbol => {
+            ctx.font = '30px "Press Start 2P"'
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillStyle = "#F9F7F1"
+            ctx.fillText(symbol.text, symbol.x, symbol.y)
+        })
+
+        thirdSlotColumn.forEach(symbol => {
             ctx.font = '30px "Press Start 2P"'
             ctx.textAlign = "center"
             ctx.textBaseline = "middle"

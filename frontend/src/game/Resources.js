@@ -11,6 +11,8 @@ class Resources{
             pBackImg2: '/assets/cloud2.png',
             pBackImg3: '/assets/cloud3.png',
             pBackImg4: '/assets/cloud4.png',
+            fruit: '/assets/Fruit.jpg',
+            
 
         };
 
