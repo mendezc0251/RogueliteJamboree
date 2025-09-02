@@ -31,10 +31,10 @@ const IntroModal = ({ onPlayGuest, onLogin }) => {
         <div id="introModal" class="modal">
             <div className="modal-content">
                 <h2>Welcome to Roguelite Jamboree!</h2>
-                <p>Play as a guest or log in to save your progress and compete on the leaderboard.</p>
+                <p>Play as a guest log in functionality coming soon...</p>
                 <div className="button-container">
                     <button onClick={handleGuest}>Play as a Guest</button>
-                    <button onClick={handleLogin}>Log In/Sign Up</button>
+                    <button onClick={handleLogin} disabled>Log In/Sign Up</button>
                 </div>
             </div>
         </div>

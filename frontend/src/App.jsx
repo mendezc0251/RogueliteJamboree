@@ -5,6 +5,7 @@ import Game from './components/Game'
 import Shop from './components/Shop'
 import About from './components/About'
 import Login from './components/Login'
+import LoginWIP from './components/LoginWIP'
 import User from './components/User'
 import { useEffect, useState } from 'react'
 
@@ -53,7 +54,7 @@ function App() {
             <li><Link to={"/"}>home</Link></li>
             <li><Link to={"/Shop"}>shop</Link></li>
             <li><Link to={"/About"}>about</Link></li>
-            {user === 'Login' ? (<li><Link to={"/Login"}>login</Link></li>) : (<li><Link to={"/User"}>{user}</Link></li>)}
+            {user === 'Login' ? (<li><Link to={"/LoginWIP"}>login</Link></li>) : (<li><Link to={"/User"}>{user}</Link></li>)}
           </ul>
         </div>
       </header>
@@ -63,6 +64,7 @@ function App() {
         <Route path='/about' element={<About />} />
         <Route path='/user' element={<User />} />
         <Route path='/login' element={<Login setUser={setUser} />} />
+        <Route path='/LoginWIP' element={<LoginWIP />}/>
       </Routes>
 
     </BrowserRouter>

@@ -258,7 +258,7 @@ export async function initCanvas(canvas, user, getUser) {
             getUser()
             let data = null;
 
-            if (user === 'Login') {
+            if (user === 'Login' || !user) {
                 data = JSON.parse(localStorage.getItem("rj_guest_data"))
             } else {
                 try {
@@ -435,7 +435,7 @@ export async function initCanvas(canvas, user, getUser) {
         getUser()
         let data = null;
 
-        if (user === 'Login') {
+        if (user === 'Login'||!data) {
             data = JSON.parse(localStorage.getItem("rj_guest_data"))
         } else {
             try {
@@ -447,7 +447,7 @@ export async function initCanvas(canvas, user, getUser) {
             }
         }
         console.log("resetting game board")
-        pachinkoGameState = data.pachinkopachinkoGameState
+        pachinkoGameState = data.pachinkoGameState
 
         pegs = generatePegs(pachinkoGameState.pegRows)
 
@@ -493,18 +493,18 @@ export async function initCanvas(canvas, user, getUser) {
 
     const fruit = resources.images.fruit
 
-    let firstSlotColumn = [{ src: fruit, x: 415, y: -75, symbol: "Blank" }, { src: fruit, x: 415, y: 75, symbol: "Blank" }, { src: fruit, x: 415, y: 225, symbol: "Blank" }, { src: fruit, x: 415, y:375, symbol: "Blank"  }, { src: fruit, x: 415, y: 525, symbol: "Blank" }]
-    let secondSlotColumn = [{ src: fruit, x: displayWidth * (3 / 6), y: 100 }, { src: fruit, x: displayWidth * (3 / 6), y: 200 }, { src: fruit, x: displayWidth * (3 / 6), y: 300 }, { src: fruit, x: displayWidth * (3 / 6), y: 400 }, { src: fruit, x: displayWidth * (3 / 6), y: 500 }]
-    let thirdSlotColumn = [{ src: fruit, x: displayWidth * (5 / 6) - 100, y: 100 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 200 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 300 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 400 }, { src: fruit, x: displayWidth * (5 / 6) - 100, y: 500 }]
+    let firstSlotColumn = [{ src: fruit, x: 415, y: -75, symbol: "Blank" }, { src: fruit, x: 415, y: 75, symbol: "Blank" }, { src: fruit, x: 415, y: 225, symbol: "Blank" }, { src: fruit, x: 415, y: 375, symbol: "Blank" }, { src: fruit, x: 415, y: 525, symbol: "Blank" }]
+    let secondSlotColumn = [{ src: fruit, x: 565, y: -75, symbol: "Blank" }, { src: fruit, x: 565, y: 75, symbol: "Blank" }, { src: fruit, x: 565, y: 225, symbol: "Blank" }, { src: fruit, x: 565, y: 375, symbol: "Blank" }, { src: fruit, x: 565, y: 525, symbol: "Blank" }]
+    let thirdSlotColumn = [{ src: fruit, x: 715, y: -75, symbol: "Blank" }, { src: fruit, x: 715, y: 75, symbol: "Blank" }, { src: fruit, x: 715, y: 225, symbol: "Blank" }, { src: fruit, x: 715, y: 375, symbol: "Blank" }, { src: fruit, x: 715, y: 525, symbol: "Blank" }]
 
     let slotGameState = {
         totalScore: 0,
         score: 0,
-        slotSpeeds:[22,33,15]
+        slotSpeeds: [22, 33, 15]
     }
 
-    buttonWidth = displayWidth*0.1
-    buttonHeight = displayHeight*0.1
+    buttonWidth = displayWidth * 0.1
+    buttonHeight = displayHeight * 0.1
 
     buttonX = (displayWidth - buttonWidth) * 0.95
     let buttonX2 = (displayWidth - buttonWidth) * 0.05
@@ -514,15 +514,15 @@ export async function initCanvas(canvas, user, getUser) {
     const slotButtons = [
         {
             text: "Stop", x: buttonX, y: buttonY2, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                if(spinning){
+                if (spinning) {
                     stop()
                 }
-                
+
             }
         },
         {
             text: "Spin", x: buttonX2, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => {
-                spinning=true
+                spinning = true
             }
         },
     ]
@@ -530,14 +530,14 @@ export async function initCanvas(canvas, user, getUser) {
     // Function used to spin the slot symbols
     function spin(speed, slotSymbols) {
         spinning = true
-        const symbolHeight=150
-        const minY=-75
+        const symbolHeight = 150
+        const minY = -75
         const cycleLength = symbolHeight * firstSlotColumn.length
-        
+
         slotSymbols.forEach(symbol => {
-            let offset = ((symbol.y-minY+speed)%cycleLength+cycleLength)%cycleLength
-            symbol.y=minY+offset
-            
+            let offset = ((symbol.y - minY + speed) % cycleLength + cycleLength) % cycleLength
+            symbol.y = minY + offset
+
         })
     }
 
@@ -547,16 +547,16 @@ export async function initCanvas(canvas, user, getUser) {
         let scoredSymbols = []
         spinning = false
 
-        const symbolHeight=150
-        const minY=-75
+        const symbolHeight = 150
+        const minY = -75
         const cycleLength = symbolHeight * firstSlotColumn.length
 
         firstSlotColumn.forEach(symbol => {
-            let offset = ((symbol.y-minY)%cycleLength+cycleLength)%cycleLength
-            offset=Math.round(offset/symbolHeight)*symbolHeight
-            symbol.y=minY+offset
-            if(symbol.y==675){
-                symbol.y=-75
+            let offset = ((symbol.y - minY) % cycleLength + cycleLength) % cycleLength
+            offset = Math.round(offset / symbolHeight) * symbolHeight
+            symbol.y = minY + offset
+            if (symbol.y == 675) {
+                symbol.y = -75
             }
             console.log(symbol.y)
         })
@@ -578,54 +578,60 @@ export async function initCanvas(canvas, user, getUser) {
                 scoredSymbols.push(symbol.symbol)
             }
         })
-    
+
         secondSlotColumn.forEach(symbol => {
-            symbol.y = Math.round((symbol.y - 100) / 100) * 100 + 100
-            if (symbol.y == 600) {
-                symbol.y = 100
+            let offset = ((symbol.y - minY) % cycleLength + cycleLength) % cycleLength
+            offset = Math.round(offset / symbolHeight) * symbolHeight
+            symbol.y = minY + offset
+            if (symbol.y == 675) {
+                symbol.y = -75
             }
+            console.log(symbol.y)
         })
 
         secondSlotColumn.forEach(symbol => {
-            if (symbol.y == 200) {
-                scoredSymbols.push(symbol.text)
-            }
-        })
-
-        secondSlotColumn.forEach(symbol => {
-            if (symbol.y == 300) {
-                scoredSymbols.push(symbol.text)
+            if (symbol.y == 75) {
+                scoredSymbols.push(symbol.symbol)
             }
         })
 
         secondSlotColumn.forEach(symbol => {
-            if (symbol.y == 400) {
-                scoredSymbols.push(symbol.text)
+            if (symbol.y == 225) {
+                scoredSymbols.push(symbol.symbol)
+            }
+        })
+
+        secondSlotColumn.forEach(symbol => {
+            if (symbol.y == 375) {
+                scoredSymbols.push(symbol.symbol)
             }
         })
 
         thirdSlotColumn.forEach(symbol => {
-            symbol.y = Math.round((symbol.y - 100) / 100) * 100 + 100
-            if (symbol.y == 600) {
-                symbol.y = 100
+            let offset = ((symbol.y - minY) % cycleLength + cycleLength) % cycleLength
+            offset = Math.round(offset / symbolHeight) * symbolHeight
+            symbol.y = minY + offset
+            if (symbol.y == 675) {
+                symbol.y = -75
+            }
+            console.log(symbol.y)
+        })
+
+        thirdSlotColumn.forEach(symbol => {
+            if (symbol.y == 75) {
+                scoredSymbols.push(symbol.symbol)
             }
         })
 
         thirdSlotColumn.forEach(symbol => {
-            if (symbol.y == 200) {
-                scoredSymbols.push(symbol.text)
+            if (symbol.y == 225) {
+                scoredSymbols.push(symbol.symbol)
             }
         })
 
         thirdSlotColumn.forEach(symbol => {
-            if (symbol.y == 300) {
-                scoredSymbols.push(symbol.text)
-            }
-        })
-
-        thirdSlotColumn.forEach(symbol => {
-            if (symbol.y == 400) {
-                scoredSymbols.push(symbol.text)
+            if (symbol.y == 375) {
+                scoredSymbols.push(symbol.symbol)
             }
         })
 
@@ -638,9 +644,9 @@ export async function initCanvas(canvas, user, getUser) {
 
     function updateSlots() {
         if (spinning) {
-            spin(slotGameState.slotSpeeds[0],firstSlotColumn)
-            spin(slotGameState.slotSpeeds[1],secondSlotColumn)
-            spin(slotGameState.slotSpeeds[2],thirdSlotColumn)
+            spin(slotGameState.slotSpeeds[0], firstSlotColumn)
+            spin(slotGameState.slotSpeeds[1], secondSlotColumn)
+            spin(slotGameState.slotSpeeds[2], thirdSlotColumn)
         } else {
         }
 
@@ -686,7 +692,7 @@ export async function initCanvas(canvas, user, getUser) {
     buttonY = displayHeight * 0.6 //50% from top
 
     const buttons = [
-        { text: "Play", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => currentScene = "characterSelect" }
+        { text: "Play", x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight, isHovered: false, onClick: () => currentScene = "pachinko" }
     ]
 
     function handleClick(mouseX, mouseY) {
@@ -962,19 +968,15 @@ export async function initCanvas(canvas, user, getUser) {
         })
 
         secondSlotColumn.forEach(symbol => {
-            ctx.font = '30px "Press Start 2P"'
-            ctx.textAlign = "center"
-            ctx.textBaseline = "middle"
-            ctx.fillStyle = "#F9F7F1"
-            ctx.fillText(symbol.text, symbol.x, symbol.y)
+            if (fruit.isLoaded) {
+                ctx.drawImage(fruit.image, symbol.x, symbol.y)
+            }
         })
 
         thirdSlotColumn.forEach(symbol => {
-            ctx.font = '30px "Press Start 2P"'
-            ctx.textAlign = "center"
-            ctx.textBaseline = "middle"
-            ctx.fillStyle = "#F9F7F1"
-            ctx.fillText(symbol.text, symbol.x, symbol.y)
+            if (fruit.isLoaded) {
+                ctx.drawImage(fruit.image, symbol.x, symbol.y)
+            }
         })
 
         slotButtons.forEach(button => {
